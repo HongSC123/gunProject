@@ -1,0 +1,21 @@
+spring:
+  mail:
+    host: smtp.gmail.com # 1
+    port: 587 # 2
+    username: kiqbbq0601 # 3
+    password: bmgxlezypclqctvw # 4
+    properties:
+      mail:
+        smtp:
+          auth: true # 5
+          timeout: 5000 # 6
+          starttls:
+            enable: true # 7
+
+#   1: SMTP 서버 호스트
+#   2: SMTP 서버 포트
+#   3: SMTP 서버 로그인 아이디: 발신자 (이메일이 test@gmail.com 이면 test가 해당)
+#   4: SMTP 서버 로그인 패스워드: 앱 비밀번호
+#   5: 사용자 인증 시도 여부 (기본값 : false)
+#   6: Socket Read Timeout 시간(ms) (기본값 : 무한대)
+#   7: StartTLS 활성화 여부 (기본값 : false)
