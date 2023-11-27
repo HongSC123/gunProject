@@ -1,26 +1,18 @@
 <template>
-  <div id="app">
-    <Header />
-    <RouterView />
-    <Footer />
-  </div>
+  <v-app>
+    <v-main>
+      <router-view/>
+    </v-main>
+  </v-app>
 </template>
 
 <script>
-import { RouterView } from 'vue-router';
-import Footer from '@/components/common/FooterPage.vue';
-import Header from '@/components/common/HeaderPage.vue';
 
 export default {
   name: 'App',
-  components: {
-    Footer,
-    Header,
-    RouterView
-},
+
+  data: () => ({
+    //
+  }),
 }
 </script>
-
-<style>
-
-</style>
