@@ -1,16 +1,31 @@
 package com.ict.gun.common.email.service;
 
+import com.ict.gun.common.email.entity.EmailMessage;
+import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring5.SpringTemplateEngine;
+
+import java.util.Random;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
 public class EmailService {
 
-    private final JavaMailSender javaMailSender;
-    private final SpringTemplateEngine templateEngine;
+    private JavaMailSender javaMailSender;
+    private SpringTemplateEngine templateEngine;
 
     public String sendMail(EmailMessage emailMessage, String type) {
         String authNum = createCode();
 
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
-        if (type.equals("password")) userService.SetTempPassword(emailMessage.getTo(), authNum);
+        //if (type.equals("password")) userService.SetTempPassword(emailMessage.getTo(), authNum);
 
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");

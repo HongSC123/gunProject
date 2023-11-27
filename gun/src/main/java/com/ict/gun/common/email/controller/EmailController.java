@@ -1,15 +1,16 @@
 package com.ict.gun.common.email.controller;
 
+import com.ict.gun.common.email.dto.EmailPostDto;
+import com.ict.gun.common.email.dto.EmailResponseDto;
+import com.ict.gun.common.email.entity.EmailMessage;
+import com.ict.gun.common.email.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import server.email.dto.EmailPostDto;
-import server.email.dto.EmailResponseDto;
-import server.email.entity.EmailMessage;
-import server.email.service.EmailService;
+
 
 @RequestMapping("/send-mail")
 @RestController
