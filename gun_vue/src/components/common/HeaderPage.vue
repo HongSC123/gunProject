@@ -49,6 +49,12 @@ export default {
     console.log(item.title);
     this.drawer = false;
   },
+  goToMyPage() {
+    console.log("Navigating to my page...");
+  },
+  logout() {
+    console.log("Logging out...");
+  },
 }
 };
 </script>
