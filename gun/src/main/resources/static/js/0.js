@@ -311,18 +311,6 @@ eval("\n\nvar bind = __webpack_require__(/*! ./helpers/bind */ \"./node_modules/
 
 /***/ }),
 
-/***/ "./node_modules/core-js/internals/array-slice-simple.js":
-/*!**************************************************************!*\
-  !*** ./node_modules/core-js/internals/array-slice-simple.js ***!
-  \**************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\nvar toAbsoluteIndex = __webpack_require__(/*! ../internals/to-absolute-index */ \"./node_modules/core-js/internals/to-absolute-index.js\");\nvar lengthOfArrayLike = __webpack_require__(/*! ../internals/length-of-array-like */ \"./node_modules/core-js/internals/length-of-array-like.js\");\nvar createProperty = __webpack_require__(/*! ../internals/create-property */ \"./node_modules/core-js/internals/create-property.js\");\n\nvar $Array = Array;\nvar max = Math.max;\n\nmodule.exports = function (O, start, end) {\n  var length = lengthOfArrayLike(O);\n  var k = toAbsoluteIndex(start, length);\n  var fin = toAbsoluteIndex(end === undefined ? length : end, length);\n  var result = $Array(max(fin - k, 0));\n  var n = 0;\n  for (; k < fin; k++, n++) createProperty(result, n, O[k]);\n  result.length = n;\n  return result;\n};\n\n\n//# sourceURL=webpack:///./node_modules/core-js/internals/array-slice-simple.js?");
-
-/***/ }),
-
 /***/ "./node_modules/node-libs-browser/mock/process.js":
 /*!********************************************************!*\
   !*** ./node_modules/node-libs-browser/mock/process.js ***!
