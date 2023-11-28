@@ -95,7 +95,9 @@ import ToggleButton from 'primevue/togglebutton';
 import Tree from 'primevue/tree';
 import TreeTable from 'primevue/treetable';
 import TriStateCheckbox from 'primevue/tristatecheckbox';
+import Test from '@/components/test/testSignUp.vue'
 
+import axios from 'axios';
 import CodeHighlight from './AppCodeHighlight';
 
 router.beforeEach(function(to, from, next) {
@@ -106,6 +108,8 @@ router.beforeEach(function(to, from, next) {
 const app = createApp(App);
 
 app.config.globalProperties.$appState = reactive({ inputStyle: 'outlined' });
+app.config.globalProperties.$axios = axios;
+app.config.globalProperties.$serverURL = "//localhost:8888"
 
 app.use(PrimeVue, { ripple: true });
 app.use(ConfirmationService);
@@ -116,6 +120,10 @@ app.directive('tooltip', Tooltip);
 app.directive('ripple', Ripple);
 app.directive('code', CodeHighlight);
 app.directive('badge', BadgeDirective);
+
+// test sign up
+app.component('Test', Test);
+
 
 app.component('Accordion', Accordion);
 app.component('AccordionTab', AccordionTab);

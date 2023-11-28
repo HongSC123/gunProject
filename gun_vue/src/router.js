@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import Dashboard from './components/Dashboard.vue';
 
 const routes = [
@@ -164,10 +164,15 @@ const routes = [
         name: 'documentation',
         component: () => import('./components/Documentation.vue'),
     },
+    {
+      path: '/test',
+      name: 'test',
+      component: () => import('./components/test/testSignUp.vue'),
+    },
 ];
 
 const router = createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(process.env.BASE_URL),
     routes,
 });
 

@@ -3,6 +3,11 @@
 ## Project setup
 ```
 npm install
+1. npm i axios --save
+2. npm i vue-router@next --save
+3. npm i vuetify --save
+4. vue add vuetify -> y -> vuetify 3(CLI)
+5. npm install @vuelidate/core @vuelidate/validators
 ```
 
 ### Compiles and hot-reloads for development

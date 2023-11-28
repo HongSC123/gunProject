@@ -18,8 +18,8 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class EmailService {
 
-    private JavaMailSender javaMailSender;
-    private SpringTemplateEngine templateEngine;
+    private final JavaMailSender javaMailSender;
+    private final SpringTemplateEngine templateEngine = new SpringTemplateEngine();
 
     public String sendMail(EmailMessage emailMessage, String type) {
         String authNum = createCode();
@@ -32,7 +32,7 @@ public class EmailService {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
             mimeMessageHelper.setTo(emailMessage.getTo()); // 메일 수신자
             mimeMessageHelper.setSubject(emailMessage.getSubject()); // 메일 제목
-            mimeMessageHelper.setText(setContext(authNum, type), true); // 메일 본문 내용, HTML 여부
+            mimeMessageHelper.setText(authNum, false); // 메일 본문 내용, HTML 여부
             javaMailSender.send(mimeMessage);
 
             log.info("Success");
