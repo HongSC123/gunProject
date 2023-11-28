@@ -3,30 +3,29 @@
     <v-app-bar app color="white" dark>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>
-        <img src="@/assets/logo.png" alt="Logo" height="40">
+        <img src="@/assets/logo.png" alt="Logo" height="40" />
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-menu offset-y>
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn icon v-bind="attrs" v-on="on">
-            <v-icon>mdi-account-circle</v-icon>
-          </v-btn>
-        </template>
-        <v-list>
-          <v-list-item @click="goToMyPage">
-            <v-list-item-title>마이페이지</v-list-item-title>
-          </v-list-item>
-          <v-list-item @click="logout">
-            <v-list-item-title>로그아웃</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
+      <template>
+        <v-dialog v-model="dialog" width="500">
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon v-bind="attrs" v-on="on">mdi-account-circle</v-icon>
+          </template>
+          <v-card>
+            <v-card-title class="headline">My Page</v-card-title>
+              <MyPage />
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="green darken-1" text @click="dialog = false">Close</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </template>
     </v-app-bar>
-
     <v-navigation-drawer v-model="drawer" app>
       <v-list-item-group>
-        <v-list-item v-for="item in items" :key="item.title" @click="handleClick">
-          <v-list-item-title>{{ item.title }}</v-list-item-title>
+        <v-list-item v-for="menu in menus" :key="menu.title" @click="handleClick">
+          <v-list-item-title>{{ menu.title }}</v-list-item-title>
         </v-list-item>
       </v-list-item-group>
     </v-navigation-drawer>
@@ -34,28 +33,30 @@
 </template>
 
 <script>
+import MyPage from "@/components/member/MyPage.vue";
 export default {
+  components: {
+    MyPage,
+  },
   data: () => ({
+    dialog: false,
     drawer: false,
-    items: [
-      { title: 'Menu 1' },
-      { title: 'Menu 2' },
-      { title: 'Menu 3' },
-      { title: 'Menu 4' },
+    menus: [
+      { title: "Menu 1" },
+      { title: "Menu 2" },
+      { title: "Menu 3" },
+      { title: "Menu 4" },
     ],
   }),
   methods: {
-  handleClick(item) {
-    console.log(item.title);
-    this.drawer = false;
+    openDialog() {
+      this.dialog = true;
+    },
+    handleClick(item) {
+      console.log(item.title);
+      this.drawer = false;
+    },
   },
-  goToMyPage() {
-    console.log("Navigating to my page...");
-  },
-  logout() {
-    console.log("Logging out...");
-  },
-}
 };
 </script>
 
