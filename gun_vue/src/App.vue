@@ -58,9 +58,9 @@ export default {
 					]
 				},
 				{
-					label: "체중관리??", icon:'pi pi-fw pi-globe',
+					label: "체형분석", icon:'pi pi-fw pi-minus-circle',
 					items: [
-						{label: 'Display', icon:'pi pi-fw pi-desktop', to:'/display'},
+						{label: 'BMI 비만도계산', icon:'pi pi-fw pi-desktop', to:'/display'},
 						{label: 'Elevation', icon:'pi pi-fw pi-external-link', to:'/elevation'},
 						{label: 'Flexbox', icon:'pi pi-fw pi-directions', to:'/flexbox'},
 						{label: 'Icons', icon:'pi pi-fw pi-search', to:'/icons'},
