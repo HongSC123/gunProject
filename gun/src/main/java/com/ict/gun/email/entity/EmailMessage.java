@@ -1,4 +1,4 @@
-package com.ict.gun.common.email.entity;
+package com.ict.gun.email.entity;
 
 import lombok.Data;
 import lombok.Builder;

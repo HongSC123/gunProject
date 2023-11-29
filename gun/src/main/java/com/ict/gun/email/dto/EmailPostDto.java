@@ -1,4 +1,4 @@
-package com.ict.gun.common.email.dto;
+package com.ict.gun.email.dto;
 
 import lombok.Getter;
 

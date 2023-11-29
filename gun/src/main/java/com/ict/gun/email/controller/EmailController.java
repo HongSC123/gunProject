@@ -1,8 +1,8 @@
-package com.ict.gun.common.email.controller;
+package com.ict.gun.email.controller;
 
-import com.ict.gun.common.email.dto.EmailPostDto;
-import com.ict.gun.common.email.entity.EmailMessage;
-import com.ict.gun.common.email.service.EmailService;
+import com.ict.gun.email.dto.EmailPostDto;
+import com.ict.gun.email.entity.EmailMessage;
+import com.ict.gun.email.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

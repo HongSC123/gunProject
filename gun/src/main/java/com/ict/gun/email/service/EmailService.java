@@ -1,6 +1,6 @@
-package com.ict.gun.common.email.service;
+package com.ict.gun.email.service;
 
-import com.ict.gun.common.email.entity.EmailMessage;
+import com.ict.gun.email.entity.EmailMessage;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
