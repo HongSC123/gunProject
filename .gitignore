@@ -145,5 +145,7 @@ yarn-error.log
 
 # static 빌드 확인
 /src/main/resources/static/
+/build/resources/main/static/
+build/resources/main/static/
 
 # End of https://www.toptal.com/developers/gitignore/api/vuejs,java,intellij+all,visualstudiocode
