@@ -45,16 +45,26 @@ dependencies {
 	 * 	추가 날짜 : 2023. 11. 27
 	 * 	Spring Boot Starter Mail : 메일 서버와 연결 해서 메일을 발송 하는데 필요한 라이브러리
 	 * 	thymeleaf : thymeleaf 라이브러리
+	 * 	jwt : Json Web Token 관련 라이브러리
+	 * 	servlet : Servlet 관련 라이브러리
+	 * 	modelmapper : ModelMapper 관련 라이브러리 entity 와 Dto 연결
 	 * */
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	// https://mvnrepository.com/artifact/org.thymeleaf/thymeleaf-spring5
 	implementation 'org.thymeleaf:thymeleaf-spring5:3.0.13.RELEASE'
+	// jwt 관련
+	implementation 'com.auth0:java-jwt:4.3.0'
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+	// servlet
+	// https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api
+	compileOnly 'javax.servlet:javax.servlet-api:3.1.0'
+	// model mapper
+	// https://mvnrepository.com/artifact/org.modelmapper/modelmapper
+	implementation 'org.modelmapper:modelmapper:3.1.1'
+
 
 }
 

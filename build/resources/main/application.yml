@@ -19,3 +19,8 @@ spring:
 #   5: 사용자 인증 시도 여부 (기본값 : false)
 #   6: Socket Read Timeout 시간(ms) (기본값 : 무한대)
 #   7: StartTLS 활성화 여부 (기본값 : false)
+
+
+jwt:
+  secret: 2doasudflibwugl2u3g4l2ui3gl12blauisdfhl34li1u23lk1uj2b312lub123
+  expired-time: 86400

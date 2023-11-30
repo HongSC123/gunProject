@@ -1,4 +1,4 @@
-package com.ict.gun.config;
+package com.ict.gun.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
