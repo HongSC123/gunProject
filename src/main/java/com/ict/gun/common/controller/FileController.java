@@ -17,6 +17,16 @@ import java.nio.file.Paths;
 @Controller
 @Slf4j
 public class FileController {
+    /**
+     *  작성자 : 김정선
+     *  작성 내용 :  파일 주소 설정 방법 application.properties 에
+     *  upload-path-member: E:/gun_workspace/gun/src/main/resources/member
+     *  라고 작성 다른 주소가 필요하다면
+     *  upload-path-####: 절대 경로
+     *  로 작성 해서 쓰면됨
+     *  다른 파일도 여기서 만들어 서 쓸것!
+     *  최초 게시일 : 23.11.30
+     * */
 
     @Value("${upload-path-member}")
     private String uploadPath;
