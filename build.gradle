@@ -65,6 +65,15 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.modelmapper/modelmapper
 	implementation 'org.modelmapper:modelmapper:3.1.1'
 
+	/**
+	 * 	작성자 : 홍성철
+	 * 	추가 목적 : Swagger 의존성 주입
+	 * 	추가 날짜 : 2023. 12. 05
+	 * 	Swagger : API 문서화를 위한 라이브러리
+	 * 	http://localhost:8888/swagger-ui/index.html
+	 * */
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+
 
 }
 
