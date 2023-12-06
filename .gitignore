@@ -142,7 +142,6 @@ dist/
 npm-debug.log
 yarn-error.log
 
-
 # static 빌드 확인
 /src/main/resources/static/
 /build/resources/main/static/
