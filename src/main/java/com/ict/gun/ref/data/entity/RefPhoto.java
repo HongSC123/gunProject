@@ -13,22 +13,21 @@ import java.util.Date;
 @ToString
 @AllArgsConstructor
 @Builder
+@SequenceGenerator(name = "sequence_generator", sequenceName = "REF_SEQUENCE", allocationSize = 1)
 @Table(name = "REF_PHOTO")
 public class RefPhoto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence_generator")
-    @SequenceGenerator(name = "sequence_generator", sequenceName = "REF_SEQUENCE", allocationSize = 1)
     private String REF_CODE;
     private String REF_PHOTO;
     private Date REF_SAVE_DATE;
     private String MEM_EMAIL;
 
-    @PrePersist
-    public void addRefPrefix() {
-        this.REF_CODE = "REF" + this.REF_CODE;
-    }
-
+//    @PrePersist
+//    public void addRefPrefix() {
+//        this.REF_CODE = "REF" + this.REF_CODE;
+//    }
 
     public RefDto toDto() {
         return RefDto.builder()
