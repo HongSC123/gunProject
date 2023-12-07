@@ -66,8 +66,6 @@ public class MemberController {
                 .memEmail(login.memEmail())
                 .memPw(login.memPw())
                 .build();
-        System.out.println("\n\nlogin 테스트 1 : " + member.getMemEmail());
-        System.out.println("\n\nlogin 테스트 1 : " + member.getMemPw());
         return ResponseEntity.ok(authService.authenticate(member));
     }
     @PostMapping("/refresh-token")
