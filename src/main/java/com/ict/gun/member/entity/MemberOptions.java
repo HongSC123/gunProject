@@ -39,5 +39,5 @@ public class MemberOptions {
     private Date memBir;
 
     @Column(name="mem_act_level")
-    private int memActLevel;
+    private String memActLevel;
 }

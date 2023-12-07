@@ -39,8 +39,8 @@ public class AuthService {
     public AuthResponse authenticate(Member member) {
         // 사용자의 암호를 검증하기 전에 암호를 인코딩합니다.
         String encodedPassword = passwordEncoder.encode(member.getMemPw());
-        System.out.println("\n\nlogin 테스트 2 : " + member.getMemEmail());
-        System.out.println("\n\nlogin 테스트 2 : " + encodedPassword);
+//        System.out.println("\n\nlogin 테스트 2 : " + member.getMemEmail());
+//        System.out.println("\n\nlogin 테스트 2 : " + encodedPassword);
 
         // matches 메서드를 사용하여 비밀번호를 확인합니다.
         if (passwordEncoder.matches(member.getMemPw(), encodedPassword)) {
@@ -50,7 +50,7 @@ public class AuthService {
             String jwtToken = jwtService.generateToken(userDetails);
             String refreshToken = jwtService.generateRefreshToken(userDetails);
             revokeAllUserTokens(member);
-            saveToken(member, jwtToken);
+            saveToken(member, refreshToken);
             return new AuthResponse(jwtToken, refreshToken);
         } else {
             // 비밀번호가 일치하지 않을 경우 예외 처리 또는 다른 작업 수행

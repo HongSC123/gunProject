@@ -19,15 +19,13 @@ public class QRef extends EntityPathBase<Ref> {
 
     public static final QRef ref = new QRef("ref");
 
-    public final StringPath MEM_EMAIL = createString("MEM_EMAIL");
-
     public final StringPath REF_CODE = createString("REF_CODE");
+
+    public final DateTimePath<java.util.Date> REF_END_DATE = createDateTime("REF_END_DATE", java.util.Date.class);
 
     public final StringPath REF_EXCODE = createString("REF_EXCODE");
 
     public final NumberPath<Integer> REF_QUAN = createNumber("REF_QUAN", Integer.class);
-
-    public final DateTimePath<java.util.Date> REF_SAVE_DATE = createDateTime("REF_SAVE_DATE", java.util.Date.class);
 
     public QRef(String variable) {
         super(Ref.class, forVariable(variable));

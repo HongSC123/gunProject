@@ -1,4 +1,4 @@
-package com.ict.gun.ref.config;
+package com.ict.gun.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
