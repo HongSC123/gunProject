@@ -19,7 +19,7 @@ public class QMemberOptions extends EntityPathBase<MemberOptions> {
 
     public static final QMemberOptions memberOptions = new QMemberOptions("memberOptions");
 
-    public final NumberPath<Integer> memActLevel = createNumber("memActLevel", Integer.class);
+    public final StringPath memActLevel = createString("memActLevel");
 
     public final DatePath<java.sql.Date> memBir = createDate("memBir", java.sql.Date.class);
 

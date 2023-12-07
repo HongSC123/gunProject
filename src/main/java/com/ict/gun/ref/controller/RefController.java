@@ -1,12 +1,15 @@
 package com.ict.gun.ref.controller;
 
 import com.ict.gun.ref.data.dto.RefDto;
+import com.ict.gun.ref.data.entity.Ref;
+import com.ict.gun.ref.data.entity.RefEx;
 import com.ict.gun.ref.service.RefService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/ref")
@@ -21,10 +24,9 @@ public class RefController {
         return ResponseEntity.ok(refList);
     }
 
-//    @PutMapping(value = "/insert")
-//    public ResponseEntity<RefDto> insertRef(@RequestBody RefDto refDto) {
-//        RefDto insertedRefDto = refService.insertRef(refDto);
-//        return ResponseEntity.ok(insertedRefDto);
+//    @PostMapping(value = "/insert")
+//    public List<RefDto> searchRefEx(@RequestBody List<RefDto> refDto) {
+//        return refService.searchRefEx(refDto);
 //    }
 
 }
