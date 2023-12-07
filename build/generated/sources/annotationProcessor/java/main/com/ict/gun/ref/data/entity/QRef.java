@@ -25,6 +25,8 @@ public class QRef extends EntityPathBase<Ref> {
 
     public final StringPath REF_EXCODE = createString("REF_EXCODE");
 
+    public final NumberPath<Long> REF_NUM = createNumber("REF_NUM", Long.class);
+
     public final NumberPath<Integer> REF_QUAN = createNumber("REF_QUAN", Integer.class);
 
     public QRef(String variable) {
