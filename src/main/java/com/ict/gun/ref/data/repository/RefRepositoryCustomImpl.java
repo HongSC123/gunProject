@@ -16,11 +16,11 @@ import java.util.List;
 public class RefRepositoryCustomImpl implements RefRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+    QRef ref = QRef.ref;
+    QRefEx refEx = QRefEx.refEx;
+    QRefPhoto refPhoto = QRefPhoto.refPhoto;
     @Override
     public List<RefDto> findByMyRefList(String email) {
-        QRef ref = QRef.ref;
-        QRefEx refEx = QRefEx.refEx;
-        QRefPhoto refPhoto = QRefPhoto.refPhoto;
 
         JPAQuery<Tuple> query = queryFactory
                 .select(
@@ -51,5 +51,22 @@ public class RefRepositoryCustomImpl implements RefRepositoryCustom {
                 .REF_QUAN(tupple.get(ref.REF_QUAN))
                 .REF_END_DATE(tupple.get(ref.REF_END_DATE))
                 .build()).toList();
+    }
+
+
+    @Override
+    public int findByRefExCode(String refExCode) {
+
+        Integer query = queryFactory
+                .select(refEx.REF_EXDATE)
+                .from(refEx)
+                .where(refEx.REF_EXCODE.eq(refExCode))
+                .fetchOne();
+
+        if(query == null) {
+            return 0;
+        } else {
+            return query;
+        }
     }
 }
