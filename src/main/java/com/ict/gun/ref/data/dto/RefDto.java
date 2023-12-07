@@ -24,6 +24,7 @@ public class RefDto {
     private int REF_EXDATE;
     private int REF_QUAN;
     private Date REF_END_DATE;
+    private Long REF_NUM;
 
 
     public Ref toEntity(RefDto refDto) {
@@ -32,6 +33,7 @@ public class RefDto {
                 .REF_EXCODE(refDto.getREF_EXCODE())
                 .REF_QUAN(refDto.getREF_QUAN())
                 .REF_END_DATE(refDto.getREF_END_DATE())
+                .REF_NUM(refDto.getREF_NUM())
                 .build();
     }
 

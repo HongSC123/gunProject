@@ -7,6 +7,7 @@ import com.ict.gun.ref.data.entity.QRefPhoto;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Date;
@@ -68,5 +69,39 @@ public class RefRepositoryCustomImpl implements RefRepositoryCustom {
         } else {
             return query;
         }
+    }
+
+    @Override
+    public String findRefCode(){
+        String refCode = queryFactory
+                .select(refPhoto.REF_CODE)
+                .from(refPhoto)
+                .orderBy(refPhoto.REF_SAVE_DATE.desc())
+                .fetchFirst();
+        return refCode;
+    }
+    @Override
+    @Transactional
+    public void deleteAllByREF_CODE(String REF_CODE){
+        queryFactory
+                .delete(ref)
+                .where(ref.REF_CODE.eq(REF_CODE))
+                .execute();
+    }
+
+    @Override
+    public long findByRefCode(String refCode) {
+        return queryFactory
+                .selectFrom(ref)
+                .where(ref.REF_CODE.eq(refCode))
+                .fetch().size();
+    }
+
+    @Override
+    public long findPhotoByRefCode(String refCode) {
+        return queryFactory
+                .selectFrom(refPhoto)
+                .where(refPhoto.REF_CODE.eq(refCode))
+                .fetch().size();
     }
 }
