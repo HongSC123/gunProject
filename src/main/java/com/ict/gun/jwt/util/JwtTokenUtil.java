@@ -21,6 +21,14 @@ public class JwtTokenUtil {
                 .signWith(SignatureAlgorithm.HS256, key)
                 .compact();
     }
+    public static String createRefreshToken(String key, long expireTimeMs) {
+
+        return Jwts.builder()
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expireTimeMs))
+                .signWith(SignatureAlgorithm.HS256, key)
+                .compact();
+    }
 
     // Claims에서 loginId 꺼내기
     public static String getLoginId(String token, String secretKey) {

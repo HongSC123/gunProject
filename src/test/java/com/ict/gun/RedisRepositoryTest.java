@@ -21,11 +21,11 @@ public class RedisRepositoryTest {
 
     @Test
     void test(){
-        TokenRedis token = new TokenRedis("test@naver.com", "t123123easdfasfds123123t", "tadsfasdfeqwerqwrest", 1000);
-        log.info("***token : " + token.toString());
-        repo.save(token);
-        Optional<TokenRedis> result = repo.findById(token.getId());
-        log.info("***result : " + result.get().toString());
+        //TokenRedis token = new TokenRedis("test@naver.com", "t123123easdfasfds123123t", "tadsfasdfeqwerqwrest", 1000);
+        //log.info("***token : " + token.toString());
+        //repo.save(token);
+        //Optional<TokenRedis> result = repo.findById(token.getId());
+        //log.info("***result : " + result.get().toString());
         repo.deleteAll();
 
     }

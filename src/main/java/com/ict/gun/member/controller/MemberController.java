@@ -9,6 +9,9 @@ import com.ict.gun.member.entity.Member;
 import com.ict.gun.member.entity.MemberOptions;
 import com.ict.gun.member.repository.MemberRepository;
 import com.ict.gun.member.service.MemberService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -104,22 +107,30 @@ public class MemberController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String,String>> login(@RequestBody Member member) {
-
+        Optional<Member> memberBase = memberRepository.findByMemEmail(member.getMemEmail());
+        if(memberBase.isEmpty()){
+            String result = "fail";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
         String Token = JwtTokenUtil.createToken(member.getMemEmail(), secretKey, expiration);
-        String RefreshToken = JwtTokenUtil.createToken(member.getMemEmail(), secretKey, refreshTokenExpiration);
+        String RefreshToken = JwtTokenUtil.createRefreshToken(secretKey, refreshTokenExpiration);
         // log.info("Token : " + Token);
         Map<String,String> result = new HashMap<>();
         result.put("accessToken", Token);
         result.put("refreshToken", RefreshToken);
-        TokenRedis tokenRedis = new TokenRedis(member.getMemEmail(), Token, RefreshToken, expiration);
+        TokenRedis tokenRedis = new TokenRedis(member.getMemEmail(), Token, RefreshToken, expiration, refreshTokenExpiration);
+        log.info("tokenRedis : " + tokenRedis.toString());
         tokenRedisRepository.save(tokenRedis);
         Optional<TokenRedis> token = tokenRedisRepository.findById(tokenRedis.getId());
         log.info("token : " + token.get().toString());
 
         // test 삭제
-        tokenRedisRepository.deleteAll();
-
+        //tokenRedisRepository.deleteAll();
         return ResponseEntity.ok().body(result);
-
+    }
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestBody String accessToken) {
+        log.info("accessToken : " + accessToken);
+        return ResponseEntity.ok("success");
     }
 }

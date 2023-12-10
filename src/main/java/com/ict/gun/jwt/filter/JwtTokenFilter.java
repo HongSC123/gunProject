@@ -29,7 +29,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, ServletException, IOException {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        log.info("filter 작동중 .. " + authorizationHeader);
+        if(authorizationHeader != null) {
+            log.info("authorizationHeader : " + authorizationHeader);
+        }
         // Header의 Authorization 값이 비어있으면 => Jwt Token을 전송하지 않음 => 로그인 하지 않음
         if(authorizationHeader == null) {
             filterChain.doFilter(request, response);
