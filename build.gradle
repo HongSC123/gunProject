@@ -62,6 +62,7 @@ dependencies {
             * 	modelmapper : ModelMapper 관련 라이브러리 entity 와 Dto 연결
     * 	nimbusds : Nimbus JWT 관련 라이브러리
             * 	security : Spring Security
+     * 		Redis : Redis 로그인 토큰 저장용 db
     **/
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
@@ -83,6 +84,12 @@ dependencies {
     implementation 'org.modelmapper:modelmapper:3.1.1'
     implementation 'com.nimbusds:nimbus-jose-jwt:9.37.1'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    // test lombok
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 
     runtimeOnly 'com.h2database:h2'
 }

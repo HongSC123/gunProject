@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - RedisRepositoryTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>RedisRepositoryTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/com.ict.gun.html">com.ict.gun</a> &gt; RedisRepositoryTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.697s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">test()</td>
+<td class="success">0.697s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>19:10:56.737 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.ict.gun.RedisRepositoryTest]: RedisRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+19:10:56.834 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.ict.gun.NewGunApplication for test class com.ict.gun.RedisRepositoryTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.0)
+
+2023-12-09T19:10:57.164+09:00  INFO 20836 --- [    Test worker] com.ict.gun.RedisRepositoryTest          : Starting RedisRepositoryTest using Java 17.0.2 with PID 20836 (started by user in E:\gun_workspace\gun)
+2023-12-09T19:10:57.166+09:00  INFO 20836 --- [    Test worker] com.ict.gun.RedisRepositoryTest          : No active profile set, falling back to 1 default profile: &quot;default&quot;
+2023-12-09T19:10:57.976+09:00  INFO 20836 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2023-12-09T19:10:57.978+09:00  INFO 20836 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-12-09T19:10:58.084+09:00  INFO 20836 --- [    Test worker] .RepositoryConfigurationExtensionSupport : Spring Data JPA - Could not safely identify store assignment for repository candidate interface com.ict.gun.jwt.token.repositry.TokenRedisRepository; If you want this repository to be a JPA repository, consider annotating your entities with one of these annotations: jakarta.persistence.Entity, jakarta.persistence.MappedSuperclass (preferred), or consider extending one of the following types with your repository: org.springframework.data.jpa.repository.JpaRepository
+2023-12-09T19:10:58.108+09:00  INFO 20836 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 124 ms. Found 6 JPA repository interfaces.
+2023-12-09T19:10:58.122+09:00  INFO 20836 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2023-12-09T19:10:58.123+09:00  INFO 20836 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2023-12-09T19:10:58.135+09:00  INFO 20836 --- [    Test worker] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.ict.gun.chat.repository.ChatRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2023-12-09T19:10:58.136+09:00  INFO 20836 --- [    Test worker] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.ict.gun.member.repository.MemberOptionRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2023-12-09T19:10:58.137+09:00  INFO 20836 --- [    Test worker] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.ict.gun.member.repository.MemberRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2023-12-09T19:10:58.137+09:00  INFO 20836 --- [    Test worker] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.ict.gun.ref.data.repository.RefExRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2023-12-09T19:10:58.138+09:00  INFO 20836 --- [    Test worker] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.ict.gun.ref.data.repository.RefPhotoRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2023-12-09T19:10:58.138+09:00  INFO 20836 --- [    Test worker] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.ict.gun.ref.data.repository.RefRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2023-12-09T19:10:58.143+09:00  INFO 20836 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 12 ms. Found 1 Redis repository interface.
+2023-12-09T19:10:58.735+09:00  INFO 20836 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2023-12-09T19:10:58.821+09:00  INFO 20836 --- [    Test worker] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.3.1.Final
+2023-12-09T19:10:58.849+09:00  INFO 20836 --- [    Test worker] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2023-12-09T19:10:59.011+09:00  INFO 20836 --- [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2023-12-09T19:10:59.028+09:00  INFO 20836 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2023-12-09T19:10:59.274+09:00  INFO 20836 --- [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection oracle.jdbc.driver.T4CConnection@66226ab
+2023-12-09T19:10:59.278+09:00  INFO 20836 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2023-12-09T19:10:59.298+09:00  WARN 20836 --- [    Test worker] org.hibernate.orm.deprecation            : HHH90000025: Oracle12cDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2023-12-09T19:10:59.298+09:00  WARN 20836 --- [    Test worker] org.hibernate.orm.deprecation            : HHH90000026: Oracle12cDialect has been deprecated; use org.hibernate.dialect.OracleDialect instead
+2023-12-09T19:11:00.022+09:00  INFO 20836 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2023-12-09T19:11:03.457+09:00  INFO 20836 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-12-09T19:11:03.651+09:00  INFO 20836 --- [    Test worker] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2023-12-09T19:11:04.882+09:00  WARN 20836 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-12-09T19:11:05.108+09:00  INFO 20836 --- [    Test worker] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2023-12-09T19:11:06.105+09:00  INFO 20836 --- [    Test worker] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@2f643a10, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@ec28717, org.springframework.security.web.context.SecurityContextHolderFilter@7668b4ff, org.springframework.security.web.header.HeaderWriterFilter@3da94286, org.springframework.web.filter.CorsFilter@315a9738, org.springframework.security.web.authentication.logout.LogoutFilter@79e686ab, com.ict.gun.jwt.filter.JwtTokenFilter@79aab764, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@2fa7a4d3, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@65f913fd, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@7790a6fb, org.springframework.security.web.session.SessionManagementFilter@79442196, org.springframework.security.web.access.ExceptionTranslationFilter@53d87c9, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@408530d2]
+2023-12-09T19:11:06.819+09:00  INFO 20836 --- [    Test worker] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2'. Database available at 'jdbc:oracle:thin:@192.168.0.131:1521:XE'
+2023-12-09T19:11:06.916+09:00  INFO 20836 --- [    Test worker] com.ict.gun.RedisRepositoryTest          : Started RedisRepositoryTest in 9.973 seconds (process running for 11.044)
+2023-12-09T19:11:07.333+09:00  INFO 20836 --- [    Test worker] com.ict.gun.RedisRepositoryTest          : ***token : TokenRedis(id=null, memEmail=test@naver.com, token=t123123easdfasfds123123t, refreshToken=tadsfasdfeqwerqwrest, exp=1000)
+2023-12-09T19:11:07.646+09:00  INFO 20836 --- [    Test worker] com.ict.gun.RedisRepositoryTest          : ***result : TokenRedis(id=2353641888192646507, memEmail=test@naver.com, token=t123123easdfasfds123123t, refreshToken=tadsfasdfeqwerqwrest, exp=1000)
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 8.5</a> at 2023. 12. 9. 오후 7:11:07</p>
+</div>
+</div>
+</body>
+</html>

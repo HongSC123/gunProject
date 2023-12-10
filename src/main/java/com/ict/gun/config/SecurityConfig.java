@@ -1,47 +1,39 @@
 package com.ict.gun.config;
 
+import com.ict.gun.jwt.filter.JwtTokenFilter;
+import com.ict.gun.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final AuthenticationProvider authenticationProvider;
-    private final JwtAuthenticationFilter jwtAuthFilter;
-    private final LogoutHandler logoutService;
+    private final MemberService userService;
+    @Value("${application.security.jwt.secret-key}")
+    String secretKey;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .authorizeRequests(authorizeRequests ->
-                        authorizeRequests
-                                .requestMatchers("/login").permitAll()
-                                .anyRequest().permitAll()
-                )
-                .sessionManagement((sessionManagement) ->
-                        sessionManagement
-                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) /* session을 사용하지 않음 */
-                )
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .logout(logoutConfig -> {
-                    logoutConfig
-                            .logoutUrl("/logout")
-                            .addLogoutHandler(logoutService)
-                            .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext());
-                });
+@Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
 
-        return http.build();
+                .httpBasic().disable()
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .addFilterBefore(new JwtTokenFilter(userService, secretKey), UsernamePasswordAuthenticationFilter.class)
+                .authorizeRequests()
+                .requestMatchers("/loader.css","/assets/**","/","/index.html", "/signup", "/css/**", "/js/**", "/images/**", "/favicon.ico", "/login").permitAll()
+                .anyRequest().authenticated();
+
+        return httpSecurity.build();
     }
+
 }
