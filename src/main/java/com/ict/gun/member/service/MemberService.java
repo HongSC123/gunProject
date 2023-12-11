@@ -77,9 +77,8 @@ public class MemberService {
         if(loginId == null) return null;
 
         Optional<Member> optionalUser = memberRepository.findByMemEmail(loginId);
-        if(optionalUser.isEmpty()) return null;
+        return optionalUser.orElse(null);
 
-        return optionalUser.get();
     }
 
 }

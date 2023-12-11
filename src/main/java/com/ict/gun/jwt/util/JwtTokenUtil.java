@@ -1,6 +1,7 @@
 package com.ict.gun.jwt.util;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -21,9 +22,12 @@ public class JwtTokenUtil {
                 .signWith(SignatureAlgorithm.HS256, key)
                 .compact();
     }
-    public static String createRefreshToken(String key, long expireTimeMs) {
+    public static String createRefreshToken(String loginId, String key, long expireTimeMs) {
+        Claims claims = Jwts.claims();
+        claims.put("loginId", loginId);
 
         return Jwts.builder()
+                .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expireTimeMs))
                 .signWith(SignatureAlgorithm.HS256, key)
@@ -37,14 +41,20 @@ public class JwtTokenUtil {
 
     // 밝급된 Token이 만료 시간이 지났는지 체크
     public static boolean isExpired(String token, String secretKey) {
-        Date expiredDate = extractClaims(token, secretKey).getExpiration();
+        Date expiredDate = null;
+        try {
+            expiredDate = extractClaims(token, secretKey).getExpiration();
+        } catch (ExpiredJwtException  e) {
+            return true;
+        }
         // Token의 만료 날짜가 지금보다 이전인지 check
         return expiredDate.before(new Date());
     }
 
     // SecretKey를 사용해 Token Parsing
-    private static Claims extractClaims(String token, String secretKey) {
+    private static Claims extractClaims(String token, String secretKey) throws ExpiredJwtException {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
     }
+
 
 }

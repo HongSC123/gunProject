@@ -10,7 +10,6 @@ import com.ict.gun.member.entity.MemberOptions;
 import com.ict.gun.member.repository.MemberRepository;
 import com.ict.gun.member.service.MemberService;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.ict.gun.member.controller.MemberUtil.decodeToken;
 import static com.ict.gun.member.controller.MemberUtil.emailToFolderName;
 
 @Slf4j
@@ -58,7 +58,7 @@ public class MemberController {
             if(!isDuplicate) {
                 // 회원가입 서비스 호출
                 member.setMemPw(encodedPw);
-                member.setMemType("member");
+                member.setMemType("USER");
                 memberService.join(member);
                 log.info("member" + member);
                 // 성공적으로 가입되었을 때
@@ -113,24 +113,74 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         String Token = JwtTokenUtil.createToken(member.getMemEmail(), secretKey, expiration);
-        String RefreshToken = JwtTokenUtil.createRefreshToken(secretKey, refreshTokenExpiration);
+        String RefreshToken = JwtTokenUtil.createRefreshToken(member.getMemEmail(),secretKey, refreshTokenExpiration);
         // log.info("Token : " + Token);
         Map<String,String> result = new HashMap<>();
         result.put("accessToken", Token);
         result.put("refreshToken", RefreshToken);
         TokenRedis tokenRedis = new TokenRedis(member.getMemEmail(), Token, RefreshToken, expiration, refreshTokenExpiration);
-        log.info("tokenRedis : " + tokenRedis.toString());
+        // log.info("tokenRedis : " + tokenRedis.toString());
         tokenRedisRepository.save(tokenRedis);
         Optional<TokenRedis> token = tokenRedisRepository.findById(tokenRedis.getId());
-        log.info("token : " + token.get().toString());
+        // log.info("token : " + token.get().toString());
 
         // test 삭제
         //tokenRedisRepository.deleteAll();
         return ResponseEntity.ok().body(result);
     }
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestBody String accessToken) {
-        log.info("accessToken : " + accessToken);
-        return ResponseEntity.ok("success");
+
+    @PostMapping("/tokencheck")
+    public ResponseEntity<String> tokenCheck(HttpServletRequest request) {
+        String result  = "success";
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/newtoken")
+    public ResponseEntity<Map<String,String>> newToken(@RequestBody Map<String, Object> errorToken) {
+
+        String refresh = (String) errorToken.get("refresh");
+        String access = (String) errorToken.get("access");
+        int error = (int) errorToken.get("error");
+
+        log.info("*** accessToken : " + access);
+        log.info("*** refreshToken : " + refresh);
+
+        Map<String,String> result = new HashMap<>();
+
+        if(error == 701){
+            log.info("ACCESS_EXPIRED");
+            Claims refreshToken = decodeToken(refresh, secretKey);
+            String memEmail = refreshToken.get("loginId", String.class);
+            log.info("memEmail : " + memEmail);
+            access = JwtTokenUtil.createToken(memEmail, secretKey, expiration);
+            TokenRedis newAccessToken = new TokenRedis(memEmail, access, refresh, expiration, refreshTokenExpiration);
+            tokenRedisRepository.deleteById(memEmail);
+            tokenRedisRepository.save(newAccessToken);
+            log.info("*** accessToken : " + access);
+        }
+        else if(error == 702){
+            log.info("REFRESH_EXPIRED");
+            Claims accessToken = decodeToken(access, secretKey);
+            String memEmail = accessToken.get("loginId", String.class);
+            log.info("memEmail : " + memEmail);
+            refresh = JwtTokenUtil.createRefreshToken(memEmail, secretKey, refreshTokenExpiration);
+            TokenRedis newRefreshToken = new TokenRedis(memEmail, access, refresh, expiration, refreshTokenExpiration);
+            tokenRedisRepository.deleteById(memEmail);
+            tokenRedisRepository.save(newRefreshToken);
+            log.info("*** refreshToken : " + refresh);
+        }
+
+        result.put("accessToken", access);
+        result.put("refreshToken", refresh);
+
+        log.info("newToken");
+        return ResponseEntity.ok().body(result);
+    }
+
+    @GetMapping("/login/kakao")
+    public ResponseEntity<String> loginKakao(@RequestParam("code") String code) {
+        log.info("code : " + code);
+        String result = "success";
+        return ResponseEntity.ok(result);
     }
 }

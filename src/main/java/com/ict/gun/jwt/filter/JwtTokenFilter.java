@@ -23,15 +23,40 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
 
+
+    private static final int ACCESS_EXPIRED = 701;
+    private static final int REFRESH_EXPIRED = 702;
+    private static final int DOUBLE_EXPIRED = 703;
     private final MemberService userService;
     private final String secretKey;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, ServletException, IOException {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String refreshToken = request.getHeader("refresh");
+        Boolean isAccessToken = null;
+        Boolean isRefreshToken = null;
         if(authorizationHeader != null) {
             log.info("authorizationHeader : " + authorizationHeader);
+            String token = authorizationHeader.split(" ")[1];
+            //log.info("token Expiration : " + JwtTokenUtil.isExpired(token, secretKey));
+            isAccessToken = JwtTokenUtil.isExpired(token, secretKey);
+            isRefreshToken = JwtTokenUtil.isExpired(refreshToken, secretKey);
+            log.info("isAccessToken : " + isAccessToken);
+            log.info("isRefreshToken : " + isRefreshToken);
         }
+
+        if(Boolean.TRUE.equals(isAccessToken) && Boolean.TRUE.equals(isRefreshToken)) {
+            response.sendError(DOUBLE_EXPIRED);
+            return;
+        }else if(Boolean.FALSE.equals(isAccessToken) && Boolean.TRUE.equals(isRefreshToken)) {
+            response.sendError(REFRESH_EXPIRED);
+            return;
+        }else if(Boolean.TRUE.equals(isAccessToken) && Boolean.FALSE.equals(isRefreshToken)) {
+            response.sendError(ACCESS_EXPIRED);
+            return;
+        }
+
         // Header의 Authorization 값이 비어있으면 => Jwt Token을 전송하지 않음 => 로그인 하지 않음
         if(authorizationHeader == null) {
             filterChain.doFilter(request, response);
@@ -61,7 +86,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         // loginUser 정보로 UsernamePasswordAuthenticationToken 발급
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                loginUser.getMemEmail(), null, List.of(new SimpleGrantedAuthority(loginUser.getRole().name())));
+                loginUser.getMemEmail(), null, List.of(new SimpleGrantedAuthority(loginUser.getMemType())));
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
         // 권한 부여

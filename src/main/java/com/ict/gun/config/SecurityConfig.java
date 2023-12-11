@@ -39,7 +39,8 @@ public class SecurityConfig {
                 .and()
                 .addFilterBefore(new JwtTokenFilter(userService, secretKey), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .requestMatchers("/loader.css","/assets/**","/","/index.html", "/signup", "/css/**", "/js/**", "/images/**", "/favicon.ico", "/login").permitAll()
+                .requestMatchers("/loader.css","/assets/**","/","/index.html", "/signup", "/css/**", "/js/**", "/images/**", "/favicon.ico", "/login","/tokencheck","/newtoken").permitAll()
+                //.requestMatchers("/tokencheck").hasRole("USER")
                 .anyRequest().authenticated()
                 .and()
                 .logout()
@@ -53,10 +54,12 @@ public class SecurityConfig {
                 .logoutSuccessHandler((request, response, authentication) -> {
                     // 로그아웃 성공 후의 사용자 정의 로직 추가 가능
                     String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+                    String refreshToken = request.getHeader("refresh");
                     // log.info("token : " + authorizationHeader);
                     if(authorizationHeader != null) {
                         String token = authorizationHeader.split(" ")[1];
                         log.info("logout token : " + token);
+                        log.info("refreshToken : " + refreshToken);
                         try {
                             Claims claims = Jwts.parserBuilder()
                                     .setSigningKey(secretKey) // Replace with your actual secret key
@@ -83,7 +86,7 @@ public class SecurityConfig {
                 // 사용자 인증 진입 지점 설정
                 .authenticationEntryPoint((request, response, authException) -> {
                     // 사용자 정의 인증 진입 지점 로직 추가 가능
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                    // response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                 });
 
 
