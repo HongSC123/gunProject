@@ -39,5 +39,8 @@ public class MemberOptions {
     private Date memBir;
 
     @Column(name="mem_act_level")
-    private String memActLevel;
+    private float memActLevel;
+
+    @Column(name="mem_reco_daily_calories")
+    private int  mem_reco_daily_calories;
 }

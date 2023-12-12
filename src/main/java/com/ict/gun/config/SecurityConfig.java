@@ -39,7 +39,8 @@ public class SecurityConfig {
                 .and()
                 .addFilterBefore(new JwtTokenFilter(userService, secretKey), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .requestMatchers("/loader.css","/assets/**","/","/index.html", "/signup", "/css/**", "/js/**", "/images/**", "/favicon.ico", "/login","/tokencheck","/newtoken","/loginkakao").permitAll()
+                .requestMatchers("/loader.css","/assets/**","/","/index.html", "/signup", "/css/**", "/js/**", "/images/**", "/favicon.ico", "/login","/tokencheck","/newtoken","/loginkakao",
+                                "/caloriedaylist/{mem_email}/{yyyy_mm_dd}", "/caloriedetail/{mem_email}/{selection_date}", "/caloriedaycalorie/{mem_email}", "/calorietoday/{mem_email}", "/calorieinsert").permitAll()
                 //.requestMatchers("/tokencheck").hasRole("USER")
                 .anyRequest().authenticated()
                 .and()
