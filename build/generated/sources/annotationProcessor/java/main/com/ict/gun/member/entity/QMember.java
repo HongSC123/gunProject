@@ -21,6 +21,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public final StringPath memAct = createString("memAct");
 
+    public final StringPath memAka = createString("memAka");
+
     public final StringPath memEmail = createString("memEmail");
 
     public final DatePath<java.sql.Date> memEn = createDate("memEn", java.sql.Date.class);
@@ -34,6 +36,8 @@ public class QMember extends EntityPathBase<Member> {
     public final DatePath<java.sql.Date> memQuit = createDate("memQuit", java.sql.Date.class);
 
     public final StringPath memType = createString("memType");
+
+    public final EnumPath<UserRole> role = createEnum("role", UserRole.class);
 
     public QMember(String variable) {
         super(Member.class, forVariable(variable));
