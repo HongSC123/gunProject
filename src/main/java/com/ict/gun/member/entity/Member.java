@@ -22,7 +22,7 @@ import java.sql.Date;
 @NoArgsConstructor
 @Builder
 @DynamicInsert
-public class Member {
+public class Member  {
     @Id
     @Email
     @NotBlank
@@ -53,4 +53,8 @@ public class Member {
     @Column(name = "mem_act")
     private String memAct;
 
+    @Column(name="mem_aka")
+    private String memAka;
+
+    private UserRole role;
 }
