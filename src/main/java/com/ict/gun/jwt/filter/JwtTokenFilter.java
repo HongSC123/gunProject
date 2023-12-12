@@ -39,11 +39,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         if(authorizationHeader != null) {
             log.info("authorizationHeader : " + authorizationHeader);
             String token = authorizationHeader.split(" ")[1];
-            //log.info("token Expiration : " + JwtTokenUtil.isExpired(token, secretKey));
+            log.info("token Expiration : " + JwtTokenUtil.isExpired(token, secretKey));
             isAccessToken = JwtTokenUtil.isExpired(token, secretKey);
             isRefreshToken = JwtTokenUtil.isExpired(refreshToken, secretKey);
-            log.info("isAccessToken : " + isAccessToken);
-            log.info("isRefreshToken : " + isRefreshToken);
+             log.info("isAccessToken : " + isAccessToken);
+             log.info("isRefreshToken : " + isRefreshToken);
         }
 
         if(Boolean.TRUE.equals(isAccessToken) && Boolean.TRUE.equals(isRefreshToken)) {

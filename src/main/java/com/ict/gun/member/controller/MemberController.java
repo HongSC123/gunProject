@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -142,6 +143,9 @@ public class MemberController {
         String access = (String) errorToken.get("access");
         int error = (int) errorToken.get("error");
 
+        Boolean isAccessTokenIssued = true;
+        Boolean isRefreshTokenIssued = true;
+
         log.info("*** accessToken : " + access);
         log.info("*** refreshToken : " + refresh);
 
@@ -154,9 +158,16 @@ public class MemberController {
             log.info("memEmail : " + memEmail);
             access = JwtTokenUtil.createToken(memEmail, secretKey, expiration);
             TokenRedis newAccessToken = new TokenRedis(memEmail, access, refresh, expiration, refreshTokenExpiration);
-            tokenRedisRepository.deleteById(memEmail);
-            tokenRedisRepository.save(newAccessToken);
-            log.info("*** accessToken : " + access);
+
+            Optional<TokenRedis> token = tokenRedisRepository.findById(memEmail);
+            if(!token.get().getRefreshToken().equals(refresh)){
+                isRefreshTokenIssued = false;
+            }
+            if(isRefreshTokenIssued){
+                tokenRedisRepository.deleteById(memEmail);
+                tokenRedisRepository.save(newAccessToken);
+                log.info("*** accessToken : " + access);
+            }
         }
         else if(error == 702){
             log.info("REFRESH_EXPIRED");
@@ -165,22 +176,49 @@ public class MemberController {
             log.info("memEmail : " + memEmail);
             refresh = JwtTokenUtil.createRefreshToken(memEmail, secretKey, refreshTokenExpiration);
             TokenRedis newRefreshToken = new TokenRedis(memEmail, access, refresh, expiration, refreshTokenExpiration);
-            tokenRedisRepository.deleteById(memEmail);
-            tokenRedisRepository.save(newRefreshToken);
-            log.info("*** refreshToken : " + refresh);
+            Optional<TokenRedis> token = tokenRedisRepository.findById(memEmail);
+            if(!token.get().getToken().equals(access)){
+                isAccessTokenIssued = false;
+            }
+            if(isAccessTokenIssued){
+                tokenRedisRepository.deleteById(memEmail);
+                tokenRedisRepository.save(newRefreshToken);
+                log.info("*** refreshToken : " + refresh);
+            }
         }
-
-        result.put("accessToken", access);
-        result.put("refreshToken", refresh);
-
-        log.info("newToken");
+        if(isAccessTokenIssued && isRefreshTokenIssued){
+            result.put("accessToken", access);
+            result.put("refreshToken", refresh);
+        }else {
+            if(!isAccessTokenIssued){
+                result.put("error", "Not a Access token we issued");
+            }
+            if(!isRefreshTokenIssued){
+                result.put("error", "Not a Refresh token we issued");
+            }
+        }
         return ResponseEntity.ok().body(result);
     }
 
-    @GetMapping("/login/kakao")
-    public ResponseEntity<String> loginKakao(@RequestParam("code") String code) {
-        log.info("code : " + code);
-        String result = "success";
+    @PostMapping("/loginkakao")
+    public ResponseEntity<Map<String,String>> loginKakao(@RequestBody Map<String, String> kakaoInfo) {
+        String accessToken = kakaoInfo.get("accessToken");
+        String refreshToken = kakaoInfo.get("refreshToken");
+        String memEmail = kakaoInfo.get("memEmail");
+
+        log.info("memEmail : " + memEmail);
+        Map<String,String> result = new HashMap<>();
+
+        result.put("accessToken", accessToken);
+        result.put("refreshToken", refreshToken);
+
         return ResponseEntity.ok(result);
+    }
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        Claims accessToken = decodeToken(request.getHeader(HttpHeaders.AUTHORIZATION).split(" ")[1], secretKey);
+        String memEmail = accessToken.get("loginId", String.class);
+        tokenRedisRepository.deleteById(memEmail);
+        return ResponseEntity.ok("success");
     }
 }
