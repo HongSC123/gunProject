@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class ChatService {
@@ -96,4 +96,38 @@ public class ChatService {
         }
     }
 
+    public int getChatYCount() {
+        try {
+            return chatRepository.getChatYCount();
+        } catch (Exception e) {
+            // 에러 처리 로직 추가
+            return 0;
+        }
+    }
+
+    //버튼 누르면 속성변환하는 메서드
+    public Chat updateChatFixStatus(int chat_num, String newFixStatus) {
+        Optional<Chat> optionalChat = chatRepository.findById((long) chat_num);
+        if (optionalChat.isPresent()) {
+            Chat chat = optionalChat.get();
+            chat.setChat_fix(newFixStatus);
+            return chatRepository.save(chat);
+        } else {
+            throw new IllegalArgumentException("Chat not found with ID: " + chat_num);
+        }
+    }
+
+    public Optional<Chat> getOneChat(int chat_num) {
+        try {
+            return chatRepository.findById((long) chat_num).stream().findFirst();
+        } catch (Exception e) {
+            // 에러 로깅 혹은 필요한 예외 처리를 수행할 수 있습니다.
+            System.err.println("Failed to fetch chat: " + e.getMessage());
+            return Optional.empty(); // 빈 Optional 반환
+        }
+    }
+
+//    public Chat findChatByChatNum(int chat_num) {
+//        return chatRepository.findByChatNum(chat_num);
+//    }
 }

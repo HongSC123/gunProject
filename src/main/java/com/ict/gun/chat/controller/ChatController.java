@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -83,4 +84,41 @@ public class ChatController {
             return 0; // 실패 시 0 반환 혹은 다른 적절한 방법으로 처리
         }
     }
+
+    @Transactional
+    @GetMapping("/chatycount")
+    public int getChatYCount() {
+        try {
+            return chatService.getChatYCount();
+        } catch (Exception e) {
+            log.error("글 갯수를 불러오는데 실패했습니다.", e.getMessage());
+            return 0; // 실패 시 0 반환 혹은 다른 적절한 방법으로 처리
+        }
+    }
+
+    @PutMapping("/chatupdate/{chat_num}")
+    public ResponseEntity<Chat> updateChatFixStatus(@PathVariable("chat_num") int chat_num, @RequestBody String newFixStatus) {
+        try {
+            Chat updatedChat = chatService.updateChatFixStatus(chat_num, newFixStatus);
+            return ResponseEntity.ok(updatedChat);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/recipe/chatdetail")
+    public ResponseEntity<Chat> getChatByChatNum(@RequestParam("chat_num") int chat_num) {
+        Optional<Chat> chat = chatService.getOneChat(chat_num);
+        return chat.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+//    @GetMapping("/{chat_num}")
+//    public ResponseEntity<Chat> getChatById(@PathVariable("chat_num") int chat_num) {
+//        Chat chat = chatService.findChatByChatNum(chat_num);
+//        if (chat != null) {
+//            return new ResponseEntity<>(chat, HttpStatus.OK);
+//        } else {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//    }
 }
