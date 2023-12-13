@@ -83,10 +83,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         // 추출한 loginId로 User 찾아오기
         Member loginUser = userService.getLoginUserByLoginId(loginId);
-
+        log.info("loginUser : " + loginUser);
         // loginUser 정보로 UsernamePasswordAuthenticationToken 발급
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                loginUser.getMemEmail(), null, List.of(new SimpleGrantedAuthority(loginUser.getMemType())));
+                loginUser.getMemEmail(), null, List.of(new SimpleGrantedAuthority(loginUser.getRole().name())));
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
         // 권한 부여

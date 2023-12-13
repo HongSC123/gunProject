@@ -18,7 +18,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
+import com.ict.gun.member.entity.UserRole;
 import java.util.Optional;
 
 @Configuration
@@ -32,6 +32,7 @@ public class SecurityConfig {
     private final TokenRedisRepository tokenRedisRepository;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+
         httpSecurity
                 .httpBasic().disable()
                 .csrf().disable()
@@ -39,8 +40,9 @@ public class SecurityConfig {
                 .and()
                 .addFilterBefore(new JwtTokenFilter(userService, secretKey), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .requestMatchers("/loader.css","/assets/**","/","/index.html", "/signup", "/css/**", "/js/**", "/images/**", "/favicon.ico", "/login","/tokencheck","/newtoken","/loginkakao").permitAll()
-                //.requestMatchers("/tokencheck").hasRole("USER")
+                .requestMatchers("/loader.css","/assets/**","/","/index.html", "/signup", "/css/**", "/js/**", "/images/**", "/favicon.ico", "/login","/newtoken","/loginkakao","/memoption").permitAll()
+                .requestMatchers("/chatinsert", "/chatrecent", "/chatcount", "/chatycount", "/chatupdate/**", "/recipe/chatdetail","/profile").authenticated()
+                .requestMatchers("/tokencheck").hasAuthority(UserRole.ADMIN.name())
                 .anyRequest().authenticated()
                 .and()
                 .logout()

@@ -7,6 +7,7 @@ import com.ict.gun.jwt.token.repositry.TokenRedisRepository;
 import com.ict.gun.jwt.util.JwtTokenUtil;
 import com.ict.gun.member.entity.Member;
 import com.ict.gun.member.entity.MemberOptions;
+import com.ict.gun.member.entity.UserRole;
 import com.ict.gun.member.repository.MemberRepository;
 import com.ict.gun.member.service.MemberService;
 import io.jsonwebtoken.Claims;
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -60,6 +62,7 @@ public class MemberController {
                 // 회원가입 서비스 호출
                 member.setMemPw(encodedPw);
                 member.setMemType("USER");
+                member.setRole(UserRole.USER);
                 memberService.join(member);
                 log.info("member" + member);
                 // 성공적으로 가입되었을 때
@@ -79,7 +82,7 @@ public class MemberController {
                                             @RequestParam("memWeight") float memWeight,
                                             @RequestParam("memHeight") float memHeight,
                                             @RequestParam("memBir") Date memBir,
-                                            @RequestParam("memActLevel") String memActLevel,
+                                            @RequestParam("memActLevel") Float memActLevel,
                                             @RequestParam("memEmail") String memEmail,
                                             @RequestPart("memPhoto") MultipartFile memPhoto) {
         MemberOptions member = new MemberOptions();
@@ -91,6 +94,7 @@ public class MemberController {
         member.setMemBir(memBir);
         member.setMemActLevel(memActLevel);
         member.setMemEmail(memEmail);
+        log.info("member : " + member);
         String forderName = "member/" + emailToFolderName(memEmail);
         // log.info("forderName : "+forderName);
         if(handler.handleFileUpload(memPhoto, forderName)){
@@ -205,6 +209,13 @@ public class MemberController {
         String accessToken = kakaoInfo.get("accessToken");
         String refreshToken = kakaoInfo.get("refreshToken");
         String memEmail = kakaoInfo.get("memEmail");
+        Member kakaoMember = new Member();
+        kakaoMember.setMemEmail(memEmail);
+        kakaoMember.setMemType("KAKAO");
+        kakaoMember.setRole(UserRole.USER);
+
+        tokenRedisRepository.save(new TokenRedis(memEmail, accessToken, refreshToken, expiration, refreshTokenExpiration));
+        memberService.join(kakaoMember);
 
         log.info("memEmail : " + memEmail);
         Map<String,String> result = new HashMap<>();
@@ -216,9 +227,33 @@ public class MemberController {
     }
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request) {
-        Claims accessToken = decodeToken(request.getHeader(HttpHeaders.AUTHORIZATION).split(" ")[1], secretKey);
-        String memEmail = accessToken.get("loginId", String.class);
-        tokenRedisRepository.deleteById(memEmail);
+        String loginType = request.getHeader("loginType");
+        if(loginType.equals("KAKAO")){
+            String memEmail = request.getHeader("memEmail");
+            tokenRedisRepository.deleteById(memEmail);
+        }
+        else if(loginType.equals("MEMBER")){
+            Claims accessToken = decodeToken(request.getHeader(HttpHeaders.AUTHORIZATION).split(" ")[1], secretKey);
+            String memEmail = accessToken.get("loginId", String.class);
+            tokenRedisRepository.deleteById(memEmail);
+        }
+        // Claims accessToken = decodeToken(request.getHeader(HttpHeaders.AUTHORIZATION).split(" ")[1], secretKey);
         return ResponseEntity.ok("success");
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<Map<String,Object>> profile(HttpServletRequest request) {
+        return ResponseEntity.ok().body(getProfile(decodeToken(request.getHeader(HttpHeaders.AUTHORIZATION).split(" ")[1], secretKey).get("loginId", String.class)));
+
+    }
+
+    private Map<String,Object> getProfile(String memEmail){
+        Optional<Member> member = memberRepository.findById(memEmail);
+        Map<String,Object> result = new HashMap<>();
+
+        result.put("memEmail", member.get().getMemEmail());
+        result.put("memPhoto", member.get().getMemPhoto());
+
+        return result;
     }
 }
