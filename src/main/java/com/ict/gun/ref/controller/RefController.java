@@ -30,7 +30,7 @@ public class RefController {
         return ResponseEntity.ok(refList);
     }
 
-    @PostMapping
+    @PostMapping("/searchRefEx")
     public List<RefDto> searchRefEx(@RequestBody List<RefDto> refDto) {
         return refService.searchRefEx(refDto);
     }

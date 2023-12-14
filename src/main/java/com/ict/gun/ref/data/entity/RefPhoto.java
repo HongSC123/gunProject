@@ -2,6 +2,7 @@ package com.ict.gun.ref.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ict.gun.ref.data.dto.RefDto;
+import com.ict.gun.ref.data.repository.RefRepository;
 import jakarta.persistence.*;
 import lombok.*;
 
