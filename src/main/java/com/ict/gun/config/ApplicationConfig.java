@@ -17,4 +17,7 @@ public class ApplicationConfig {
         return new BCryptPasswordEncoder();
     }
 
+    public boolean matches(String currentPassword, String memPw) {
+        return passwordEncoder().matches(currentPassword, memPw);
+    }
 }
