@@ -1,7 +1,10 @@
 package com.ict.gun.chat.service;
 
+import com.ict.gun.chat.dto.FridgeInfoRequest;
 import com.ict.gun.chat.entity.Chat;
 import com.ict.gun.chat.repository.ChatRepository;
+import com.ict.gun.ref.data.repository.RefPhotoRepository;
+import com.ict.gun.ref.data.repository.RefRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,89 +19,60 @@ public class ChatService {
 
     @Autowired
     private final ChatRepository chatRepository;
+    private final RefPhotoRepository refPhotoRepository;
+    private final RefRepository refRepository;
 
-    public ChatService(ChatRepository chatRepository) {
+    public ChatService(ChatRepository chatRepository, RefRepository refRepository, RefPhotoRepository refPhotoRepository) {
         this.chatRepository = chatRepository;
+        this.refPhotoRepository = refPhotoRepository;
+        this.refRepository = refRepository;
     }
 
 
     @Transactional
-    public void saveChat(String chat_content, String chat_title, String mem_email) {
+    public void saveChat(String chat_content, String chat_title, String memEmail) {
         Chat chat = new Chat();
 
-        // chat_content 필드 설정
         if (chat_content != null && !chat_content.isEmpty()) {
             chat.setChat_content(chat_content);
         } else {
-            // chat_content가 null이거나 빈 문자열인 경우 예외 처리 또는 기본값 설정
-            // 예를 들어, 기본값으로 "No content" 등을 설정할 수 있습니다.
             chat.setChat_content("No content");
         }
 
-        // chat_title 필드 설정
         chat.setChat_title(chat_title);
-
-        // chat_date는 LocalDateTime.now()를 통해 현재 시간으로 자동 설정됨
         chat.setChat_date(LocalDateTime.now());
-
-        // chat_fix 필드 설정 (기본값으로 설정하는 경우)
         chat.setChat_fix("N");
+        chat.setMem_email(memEmail);
 
-        // mem_email 필드 설정 (값이 넘어오면 설정)
-        if (mem_email != null && !mem_email.isEmpty()) {
-            chat.setMem_email(mem_email);
-        }
-
-        // chat_num은 시퀀스를 통해 자동으로 생성됨
-
-        // chatRepository를 통해 chat 저장
         chatRepository.save(chat);
     }
 
-
-
-
-//    @Transactional
-//    public String deleteOldestChats() {
-//        try {
-//            int numberOfChatsToKeep = 5; // 유지할 최신 채팅의 수를 일단(5)로 설정
-//
-//            List<Chat> chatsWithFixN = chatRepository.findByChat_fix("N");
-//
-//            if (chatsWithFixN.size() > numberOfChatsToKeep) {
-//                chatRepository.deleteOldestChatWithFixN();
-//                return "성공적으로 삭제했습니다.";
-//            }
-//
-//            return "삭제할 대상이 없습니다.";
-//        } catch (Exception e) {
-//            return "삭제에 실패했습니다.";
-//        }
-//    }
-    public List<Chat> getAllChats() {
+    @Transactional
+    public List<Chat> getAllChats(String memEmail) {
         try {
-            return chatRepository.findAll();
+            // 이메일 값과 DB의 mem_email 값이 일치하는 데이터만을 가져오는 메소드 호출
+            return chatRepository.findAll(memEmail);
         } catch (Exception e) {
             // 에러 로깅 혹은 필요한 예외 처리를 수행할 수 있습니다.
             // 여기서는 간단하게 에러 메시지 출력 후 빈 리스트 반환합니다.
-            System.err.println("Failed to fetch all chats: " + e.getMessage());
+            System.err.println("Failed to fetch chats for the user: " + e.getMessage());
             return Collections.emptyList(); // 빈 리스트 반환
         }
     }
 
     // 글의 총 갯수를 반환하는 메서드
-    public int getChatCount() {
+    public int getChatCount(String memEmail) {
         try {
-            return chatRepository.getChatCount();
+            return chatRepository.getChatCount(memEmail);
         } catch (Exception e) {
             // 에러 처리 로직 추가
             return 0;
         }
     }
 
-    public int getChatYCount() {
+    public int getChatYCount(String memEmail) {
         try {
-            return chatRepository.getChatYCount();
+            return chatRepository.getChatYCount(memEmail);
         } catch (Exception e) {
             // 에러 처리 로직 추가
             return 0;
@@ -127,7 +101,34 @@ public class ChatService {
         }
     }
 
-//    public Chat findChatByChatNum(int chat_num) {
-//        return chatRepository.findByChatNum(chat_num);
+    public List<Chat> searchChat(String searchTerm, String memEmail) {
+        return chatRepository.searchChat(searchTerm, memEmail);
+    }
+
+    public List<Chat> findChat(String searchTerm, String memEmail) {
+        return chatRepository.findChat(searchTerm, memEmail);
+    }
+
+//    public String getDietRecipeFromFridge(String email) {
+//        // 냉장고 정보를 기반으로 다이어트 레시피를 생성하는 로직을 구현합니다.
+//        // 필요한 정보를 조회하고 적절한 레시피를 생성합니다.
+//        String recommendedRecipe = "";
+//
+//        // 냉장고 정보를 기반으로 식품명을 조회합니다.
+//        String foodName = chatRepository.findRefExNameByMemEmail(email);
+//
+//        // 추천 레시피를 생성하는 로직을 구현합니다.
+//        recommendedRecipe = generateDietRecipeBasedOnFood(foodName);
+//
+//        return recommendedRecipe;
 //    }
+//
+//    private String generateDietRecipeBasedOnFood(String foodName) {
+//        // 식품명을 기반으로 다이어트 레시피를 생성하는 로직을 구현합니다.
+//        // 실제로 레시피를 추천하거나 관련된 레시피를 가져오는 작업을 수행합니다.
+//        String dietRecipe = "냉장고에 있는 " + foodName + "을(를) 활용한 다이어트 레시피 추천: ...";
+//
+//        return dietRecipe;
+//    }
+
 }

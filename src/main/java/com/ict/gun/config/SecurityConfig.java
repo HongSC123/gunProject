@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .and()
                 .addFilterBefore(new JwtTokenFilter(userService, secretKey), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .requestMatchers("/loader.css","/assets/**","/","/index.html", "/signup", "/css/**", "/js/**", "/images/**", "/favicon.ico", "/login","/tokencheck","/newtoken","/loginkakao").permitAll()
+                .requestMatchers("/loader.css","/assets/**","/","/index.html", "/signup", "/css/**", "/js/**", "/images/**", "/favicon.ico", "/login","/tokencheck","/newtoken","/loginkakao", "/chatinsert", "/chatrecent", "/chatcount", "/chatycount", "/chatupdate/{chat_num}", "/recipe/chatdetail").permitAll()
                 //.requestMatchers("/tokencheck").hasRole("USER")
                 .anyRequest().authenticated()
                 .and()
