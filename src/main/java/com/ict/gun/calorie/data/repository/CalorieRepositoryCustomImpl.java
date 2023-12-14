@@ -52,7 +52,7 @@ public class CalorieRepositoryCustomImpl implements CalorieRepositoryCustom {
     @Override
     public List<CalorieDto> searchByDayCalorieList(String yyyymm, String mem_email) {
 
-        log.info("칼로리 레포지토리Impl이에요 회원 이메일 : " + mem_email + "  yyyymm " + yyyymm);
+        log.info("칼로리 레포지토리Impl이에요 회원 이메일 : " + mem_email + "  yyyymm : " + yyyymm);
         JPAQuery<Tuple> query = queryFactory
                 .select(id.registration_date_ymd,
                         id.ingest_calorie.sum()

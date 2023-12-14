@@ -8,4 +8,5 @@ import lombok.Setter;
 public class dataToSend {
     private String chat_title;
     private String chat_content;
+    private String memEmail;
 }

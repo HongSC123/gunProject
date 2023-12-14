@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.List;
 
 @Slf4j
@@ -32,10 +33,30 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, ServletException, IOException {
+
+        if (request.getHeader(HttpHeaders.AUTHORIZATION) != null  && request.getHeader(HttpHeaders.AUTHORIZATION).startsWith("Kakao ")) {
+            String loginId = request.getHeader("memEmail");
+            Member loginUser = userService.getLoginUserByLoginId(loginId);
+
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                    loginUser.getMemEmail(), null, List.of(new SimpleGrantedAuthority(loginUser.getRole().name())));
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+            // 권한 부여
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         String refreshToken = request.getHeader("refresh");
+        String loginType = request.getHeader("loginType");
         Boolean isAccessToken = null;
         Boolean isRefreshToken = null;
+        //log.info(authorizationHeader);
+        //log.info(refreshToken);
+        //log.info("loginType : " + loginType);
+
         if(authorizationHeader != null) {
             log.info("authorizationHeader : " + authorizationHeader);
             String token = authorizationHeader.split(" ")[1];
@@ -44,6 +65,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             isRefreshToken = JwtTokenUtil.isExpired(refreshToken, secretKey);
              log.info("isAccessToken : " + isAccessToken);
              log.info("isRefreshToken : " + isRefreshToken);
+        }
+        if(authorizationHeader == null) {
+            log.info("헤더 없음");
         }
 
         if(Boolean.TRUE.equals(isAccessToken) && Boolean.TRUE.equals(isRefreshToken)) {
@@ -83,10 +107,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         // 추출한 loginId로 User 찾아오기
         Member loginUser = userService.getLoginUserByLoginId(loginId);
-
+        // log.info("loginUser : " + loginUser);
         // loginUser 정보로 UsernamePasswordAuthenticationToken 발급
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                loginUser.getMemEmail(), null, List.of(new SimpleGrantedAuthority(loginUser.getMemType())));
+                loginUser.getMemEmail(), null, List.of(new SimpleGrantedAuthority(loginUser.getRole().name())));
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
         // 권한 부여

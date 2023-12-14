@@ -22,34 +22,34 @@ public class CalorieService {
     private final CalorieRepository calorieRepository;
     private final CalorieRepositoryCustomImpl calorieRepositoryCustomImpl;
 
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yy/MM/dd HH:mm");
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     //달력 - 원하는 달의 일별 총 칼로리 조회
     @Transactional
-    public List<CalorieDto> searchByDayCalorieList(String mem_email, Timestamp yyyymmdd) {
+    public List<CalorieDto> searchByDayCalorieList(String mem_email, String yyyymm) {
 
-        log.info("칼로리 서비스에요 회원 이메일 : " + mem_email + " yyyymmdd " + yyyymmdd);
+/*        log.info("칼로리 서비스에요 회원 이메일 : " + mem_email + " yyyymmdd " + yyyymmdd);
 
         // Timestamp를 String으로 변환
         String strStartDate = dateFormat.format(yyyymmdd);
 
         String yyyymm = strStartDate.substring(0, 5);
 
-        log.info("timestamp 형식을 변환한 String : " + yyyymm);
+        log.info("timestamp 형식을 변환한 String : " + yyyymm);*/
 
-        log.info("칼로리 서비스에요 회원 이메일 : " + mem_email + "  yyyymmdd " + yyyymm);
+        log.info("칼로리 서비스에요 회원 이메일 : " + mem_email + "  yyyymmdd : " + yyyymm);
         return calorieRepositoryCustomImpl.searchByDayCalorieList(yyyymm, mem_email);
 
     }
 
     //선택한 날의 음식과 칼로리 정보 상세보기 페이지 출력
     @Transactional
-    public List<CalorieDto> searchDetailDietList(String mem_email, Timestamp selection_date){
+    public List<CalorieDto> searchDetailDietList(String mem_email, String selection_date){
 
         // Timestamp를 String으로 변환
         String strStartDate = dateFormat.format(selection_date);
 
-        String selected_Date = strStartDate.substring(0, 8);
+        String selected_Date = strStartDate.substring(0, 10);
 
         log.info("timestamp형식을 변환한 String : " + selected_Date);
 

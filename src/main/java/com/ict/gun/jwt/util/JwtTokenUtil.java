@@ -22,6 +22,9 @@ public class JwtTokenUtil {
                 .signWith(SignatureAlgorithm.HS256, key)
                 .compact();
     }
+
+
+
     public static String createRefreshToken(String loginId, String key, long expireTimeMs) {
         Claims claims = Jwts.claims();
         claims.put("loginId", loginId);

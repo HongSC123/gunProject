@@ -49,11 +49,11 @@ public class CalorieController {
 //    const response = axios fetch("http://localhost:8888/calorie/" + dailyFood); // 여러 시도 코드 주석
 
     //달력 - 원하는 달의 일별 총 칼로리 조회
-    @GetMapping("/caloriedaylist/{mem_email}/{yyyy_mm_dd}")
+    @GetMapping("/caloriedaylist/{mem_email}/{yyyy_mm}")
     public ResponseEntity<List<CalorieDto>> searchDayCalorieList(@PathVariable("mem_email") String mem_email,
-                                                                 @PathVariable("yyyy_mm_dd") Timestamp yyyymmdd){
-        log.info("caloriedaylist 컨트롤러에요 " + mem_email + " " + yyyymmdd);
-        List<CalorieDto> calorie = calorieService.searchByDayCalorieList(mem_email, yyyymmdd);
+                                                                 @PathVariable("yyyy_mm") String yyyy_mm){
+        log.info("caloriedaylist 컨트롤러에요 " + mem_email + " " + yyyy_mm);
+        List<CalorieDto> calorie = calorieService.searchByDayCalorieList(mem_email, yyyy_mm);
         log.info("caloriedaylist 컨트롤러에서 반환할 객체에요 " + calorie);
         return ResponseEntity.ok(calorie);
     }
@@ -61,7 +61,7 @@ public class CalorieController {
     //선택한 날의 음식과 칼로리 정보 상세보기 페이지 출력
     @GetMapping("/caloriedetail/{mem_email}/{selection_date}")
     public ResponseEntity<List<CalorieDto>> searchDetailDietList(@PathVariable("mem_email") String mem_email,
-                                                          @PathVariable("selection_date") Timestamp selection_date) {
+                                                                 @PathVariable("selection_date") String selection_date) {
         log.info("caloriedetail 컨트롤러에요 " + mem_email + " " + selection_date);
         List<CalorieDto> calorie = calorieService.searchDetailDietList(mem_email, selection_date);
         log.info("caloriedetail 컨트롤러에서 반환할 객체에요 " + mem_email + " " + selection_date);
@@ -80,11 +80,11 @@ public class CalorieController {
     public Optional<CalorieDto> searchTodayCalorie(@PathVariable("mem_email") String mem_email){
         LocalDateTime now = LocalDateTime.now();
 
-        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yy/MM/dd");
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         String formattedNow1 = now.format(formatter1);
 
-        String now_date_time = formattedNow1.substring(0, 8);
+        String now_date_time = formattedNow1.substring(2, 8);
 
         return calorieService.searchTodayCalorie(mem_email, now_date_time);
 
@@ -95,12 +95,12 @@ public class CalorieController {
     public ResponseEntity<?> insertCalorie(@RequestBody IngestDiet ingestDiet) {
         LocalDateTime now = LocalDateTime.now();
         
-        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yy/MM/dd HH:mm:ss");
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         
         String formattedNow1 = now.format(formatter1);
 
-        String format1 = formattedNow1.substring(0, 8);
-        String format2 = formattedNow1.substring(9, 14);
+        String format1 = formattedNow1.substring(0, 10);
+        String format2 = formattedNow1.substring(11, 16);
         
         log.info("음식 저장할때 년월일 형식 String : " + format1);
 
