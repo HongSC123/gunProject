@@ -8,6 +8,7 @@ import com.ict.gun.jwt.util.JwtTokenUtil;
 import com.ict.gun.member.entity.Member;
 import com.ict.gun.member.entity.MemberOptions;
 import com.ict.gun.member.entity.UserRole;
+import com.ict.gun.member.repository.MemberOptionRepository;
 import com.ict.gun.member.repository.MemberRepository;
 import com.ict.gun.member.service.MemberService;
 import io.jsonwebtoken.Claims;
@@ -22,8 +23,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -39,6 +44,7 @@ public class MemberController {
     private final ApplicationConfig passwordEncoder;
     private final MemberRepository memberRepository;
     private final TokenRedisRepository tokenRedisRepository;
+    private final MemberOptionRepository memberOptionRepository;
 
     @Value("${application.security.jwt.secret-key}")
     String secretKey;
@@ -61,8 +67,7 @@ public class MemberController {
             if(!isDuplicate) {
                 // 회원가입 서비스 호출
                 member.setMemPw(encodedPw);
-                member.setMemType("USER");
-                member.setRole(UserRole.USER);
+                member.setMemType(member.getRole().name());
                 memberService.join(member);
                 log.info("member" + member);
                 // 성공적으로 가입되었을 때
@@ -112,25 +117,27 @@ public class MemberController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String,String>> login(@RequestBody Member member) {
+        log.info("member : " + member);
         Optional<Member> memberBase = memberRepository.findByMemEmail(member.getMemEmail());
-        if(memberBase.isEmpty()){
-            String result = "fail";
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-        String Token = JwtTokenUtil.createToken(member.getMemEmail(), secretKey, expiration);
-        String RefreshToken = JwtTokenUtil.createRefreshToken(member.getMemEmail(),secretKey, refreshTokenExpiration);
-        // log.info("Token : " + Token);
         Map<String,String> result = new HashMap<>();
-        result.put("accessToken", Token);
-        result.put("refreshToken", RefreshToken);
-        TokenRedis tokenRedis = new TokenRedis(member.getMemEmail(), Token, RefreshToken, expiration, refreshTokenExpiration);
-        // log.info("tokenRedis : " + tokenRedis.toString());
-        tokenRedisRepository.save(tokenRedis);
-        Optional<TokenRedis> token = tokenRedisRepository.findById(tokenRedis.getId());
-        // log.info("token : " + token.get().toString());
-
-        // test 삭제
-        //tokenRedisRepository.deleteAll();
+        if(memberBase.isEmpty()){
+            result.put("error", "801");
+        }
+        if(memberBase.get().getRole().name().equals(UserRole.ADMIN.name())){
+            result.put("error", "803");
+        }
+        if(!passwordEncoder.passwordEncoder().matches(member.getMemPw(), memberBase.get().getMemPw())){
+            result.put("error", "802");
+        }else{
+            String Token = JwtTokenUtil.createToken(member.getMemEmail(), secretKey, expiration);
+            String RefreshToken = JwtTokenUtil.createRefreshToken(member.getMemEmail(),secretKey, refreshTokenExpiration);
+            result.put("accessToken", Token);
+            result.put("refreshToken", RefreshToken);
+            result.put("role", memberBase.get().getRole().toString());
+            TokenRedis tokenRedis = new TokenRedis(member.getMemEmail(), Token, RefreshToken, expiration, refreshTokenExpiration);
+            tokenRedisRepository.save(tokenRedis);
+            Optional<TokenRedis> token = tokenRedisRepository.findById(tokenRedis.getId());
+        }
         return ResponseEntity.ok().body(result);
     }
 
@@ -213,6 +220,13 @@ public class MemberController {
         kakaoMember.setMemEmail(memEmail);
         kakaoMember.setMemType("KAKAO");
         kakaoMember.setRole(UserRole.USER);
+        kakaoMember.setMemPw(memEmail);
+        if (memberRepository.findById(memEmail).get().getMemEn() != null) {
+            kakaoMember.setMemMod(new Date(System.currentTimeMillis()));
+        } else {
+            kakaoMember.setMemEn(new Date(System.currentTimeMillis()));
+        }
+        kakaoMember.setMemAct("Y");
 
         tokenRedisRepository.save(new TokenRedis(memEmail, accessToken, refreshToken, expiration, refreshTokenExpiration));
         memberService.join(kakaoMember);
@@ -222,6 +236,7 @@ public class MemberController {
 
         result.put("accessToken", accessToken);
         result.put("refreshToken", refreshToken);
+        result.put("role", UserRole.USER.name());
 
         return ResponseEntity.ok(result);
     }
@@ -243,17 +258,79 @@ public class MemberController {
 
     @GetMapping("/profile")
     public ResponseEntity<Map<String,Object>> profile(HttpServletRequest request) {
-        return ResponseEntity.ok().body(getProfile(decodeToken(request.getHeader(HttpHeaders.AUTHORIZATION).split(" ")[1], secretKey).get("loginId", String.class)));
-
+        if(request.getHeader("loginType").equals("KAKAO")){
+            String memEmail = request.getHeader("memEmail");
+            return ResponseEntity.ok().body(getProfile(memEmail));
+        }else{
+            return ResponseEntity.ok().body(getProfile(decodeToken(request.getHeader(HttpHeaders.AUTHORIZATION).split(" ")[1], secretKey).get("loginId", String.class)));
+        }
     }
 
     private Map<String,Object> getProfile(String memEmail){
         Optional<Member> member = memberRepository.findById(memEmail);
+        MemberOptions memberOptions = new MemberOptions();
+        try{
+            memberOptions = memberOptionRepository.findById(memEmail).get();
+        }catch (Exception e){
+            memberOptions = new MemberOptions();
+        }
+
         Map<String,Object> result = new HashMap<>();
 
-        result.put("memEmail", member.get().getMemEmail());
+        result.put("memEmail", memEmail);
         result.put("memPhoto", member.get().getMemPhoto());
+        result.put("memGen", memberOptions.getMemGen());
+        result.put("memWeight", memberOptions.getMemWeight());
+        result.put("memHeight", memberOptions.getMemHeight());
+        result.put("memBir", memberOptions.getMemBir());
+        result.put("memActLevel", memberOptions.getMemActLevel());
 
         return result;
+    }
+
+    @PostMapping("/changePassword")
+    private ResponseEntity<Map<String, String>> changePassword(HttpServletRequest request, @RequestBody Map<String, String> password){
+        if(request.getHeader("loginType").equals("KAKAO")){
+            String memEmail = request.getHeader("memEmail");
+            memberRepository.findById(memEmail).get().setMemPw(password.get("newPassword"));
+            return ResponseEntity.ok().body(null);
+        }
+        Claims claims = decodeToken(request.getHeader(HttpHeaders.AUTHORIZATION).split(" ")[1], secretKey);
+        String memEmail = claims.get("loginId", String.class);
+        Member member = memberRepository.findById(memEmail).get();
+        if(passwordEncoder.matches(password.get("currentPassword"), member.getMemPw())){
+            member.setMemPw(passwordEncoder.passwordEncoder().encode(password.get("newPassword")));
+            memberRepository.save(member);
+            Map<String, String> result = new HashMap<>();
+            result.put("result", "success");
+            return ResponseEntity.ok(result);
+        }else{
+            Map<String, String> result = new HashMap<>();
+            result.put("error","기존 비밀번호가 다릅니다.");
+            return ResponseEntity.ok().body(result);
+        }
+    }
+    @GetMapping("/admin/list")
+    public List<Member> adminList(){
+        return memberRepository.findByRoleNot(UserRole.ADMIN);
+    }
+    @PostMapping("/login/face")
+    public ResponseEntity<String> loginFace(HttpServletRequest request){
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder("python", "E:/third_project/OpenCV-Face.recognition-master/onefile.py","E:/third_project/OpenCV-Face.recognition-master/FaceFile");
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+            // 스트림 읽기
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+            int exitCode = process.waitFor();
+            log.info("Exit code: " + exitCode);
+            return ResponseEntity.ok("success");
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
