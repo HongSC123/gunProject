@@ -29,8 +29,26 @@ public class ChatService {
     }
 
 
+//    @Transactional
+//    public void saveChat(String chat_content, String chat_title, String memEmail) {
+//        Chat chat = new Chat();
+//
+//        if (chat_content != null && !chat_content.isEmpty()) {
+//            chat.setChat_content(chat_content);
+//        } else {
+//            chat.setChat_content("No content");
+//        }
+//
+//        chat.setChat_title(chat_title);
+//        chat.setChat_date(LocalDateTime.now());
+//        chat.setChat_fix("N");
+//        chat.setMem_email(memEmail);
+//
+//        chatRepository.save(chat);
+//    }
+
     @Transactional
-    public void saveChat(String chat_content, String chat_title, String memEmail) {
+    public void saveChat(String chat_content, String chat_title, String mem_email) {
         Chat chat = new Chat();
 
         if (chat_content != null && !chat_content.isEmpty()) {
@@ -42,9 +60,27 @@ public class ChatService {
         chat.setChat_title(chat_title);
         chat.setChat_date(LocalDateTime.now());
         chat.setChat_fix("N");
-        chat.setMem_email(memEmail);
+        chat.setMem_email(mem_email);
 
         chatRepository.save(chat);
+
+        // 추가 작업 - 특정 조건을 검사하고 삭제 등의 로직 수행
+        String chat_fix = "N";
+        while (countNChats(mem_email, chat_fix) >= 30) {
+            deleteOldestNChat(mem_email, chat_fix);
+        }
+    }
+
+    private int countNChats(String mem_email, String chat_fix) {
+        return chatRepository.countByCondition(mem_email, chat_fix);
+    }
+
+    private void deleteOldestNChat(String mem_email, String chat_fix) {
+        List<Chat> nChats = chatRepository.seekbyCondition(mem_email, chat_fix);
+        if (!nChats.isEmpty()) {
+            Chat oldestChat = nChats.get(0);
+            chatRepository.delete(oldestChat);
+        }
     }
 
     @Transactional
@@ -52,6 +88,19 @@ public class ChatService {
         try {
             // 이메일 값과 DB의 mem_email 값이 일치하는 데이터만을 가져오는 메소드 호출
             return chatRepository.findAll(memEmail);
+        } catch (Exception e) {
+            // 에러 로깅 혹은 필요한 예외 처리를 수행할 수 있습니다.
+            // 여기서는 간단하게 에러 메시지 출력 후 빈 리스트 반환합니다.
+            System.err.println("Failed to fetch chats for the user: " + e.getMessage());
+            return Collections.emptyList(); // 빈 리스트 반환
+        }
+    }
+
+    @Transactional
+    public List<Chat> getFixedChats(String memEmail) {
+        try {
+            // 이메일 값과 DB의 mem_email 값이 일치하는 데이터만을 가져오는 메소드 호출
+            return chatRepository.findFixed(memEmail);
         } catch (Exception e) {
             // 에러 로깅 혹은 필요한 예외 처리를 수행할 수 있습니다.
             // 여기서는 간단하게 에러 메시지 출력 후 빈 리스트 반환합니다.
