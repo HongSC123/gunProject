@@ -4,9 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ict.gun.common.FileHandler;
 import com.ict.gun.memPhysical.data.entity.MemPhysical;
+import com.ict.gun.memPhysical.repository.MemPhysicalRepository;
 import com.ict.gun.memPhysical.service.MemPhysicalService;
 import com.ict.gun.member.repository.MemberRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,19 +17,23 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
+import java.io.Console;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.sql.Date;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
-@CrossOrigin("http://localhost:8888")
+
 @RestController
 public class MemPhysicalController {
     private final MemberRepository memberRepository;
     private final MemPhysicalService memPhysicalService;
     private MultipartFile memPhysical;
+
 
 
     public MemPhysicalController(MemPhysicalService memPhysicalService,
@@ -37,14 +44,15 @@ public class MemPhysicalController {
 
     @PostMapping("/memPhysical/insert") //측정 정보 저장
     public ResponseEntity<String> memPhysicalInsert (@RequestParam("memPhysical") MultipartFile memPhysical
-    , HttpServletRequest request) {
+                                                     , @RequestParam("memEmail") String memEmail
+            , HttpServletRequest request) {
         this.memPhysical = memPhysical;
-        String memEmail = request.getHeader("memEmail");
         MemPhysical mem_physical = new MemPhysical();
         mem_physical.setMemLocation("정면");
         mem_physical.setMemInputDate(new Date(System.currentTimeMillis()));
         mem_physical.setMemEmail(memEmail);
 
+        memPhysicalService.save(mem_physical);
         FileHandler handler = new FileHandler();
         String phyPhotoDir = "/physical";
         if(handler.handleFileUpload(memPhysical,phyPhotoDir)){
@@ -102,15 +110,60 @@ public class MemPhysicalController {
         }
     }
 
-    @GetMapping("/detail/physical") //상세보기
-    public ResponseEntity<MemPhysical> memPhysicalDetail(@RequestParam("mem_email") String memEmail) {
-        log.info("memPhysical detail");
+    @PostMapping("/detail/physical") //상세보기
+    public ResponseEntity<Map<String, Object>> memPhysicalDetail(HttpServletRequest request) {
+        String memEmail = request.getHeader("memEmail");
+        Map<String, Object> result = new HashMap<>();
+        // log.info("memPhysical detail");
+        log.info("memEmail : " + memEmail);
         MemPhysical memPhysical = memPhysicalService.findByMemEmail(memEmail);
+        log.info("memPhysical : " + memPhysical);
+        result.put("Location",memPhysical.getMemLocation());
+        result.put("InputDate",memPhysical.getMemInputDate().toString());
+
+        // JSON 문자열
+        String jsonString = memPhysical.getMemPoint();
+        // Jackson ObjectMapper 생성
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> pointMap = new HashMap<>();
+
+        try {
+            // JSON 문자열을 MyDataObject 클래스의 내부 클래스로 변환
+            OuterClass.PointData myDataObject = objectMapper.readValue(jsonString, OuterClass.PointData.class);
+
+            // 변환된 객체 출력
+            log.info("ear: " + myDataObject.getEar());
+            pointMap.put("ear",myDataObject.getEar());
+            log.info("shoulder: " + myDataObject.getShoulder());
+            pointMap.put("shoulder",myDataObject.getShoulder());
+            log.info("hip: " + myDataObject.getHip());
+            pointMap.put("hip",myDataObject.getHip());
+            log.info("knee: " + myDataObject.getKnee());
+            pointMap.put("knee",myDataObject.getKnee());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        result.put("Point",pointMap);
         // 만약 해당 이메일로 찾은 정보가 없을 경우 NOT_FOUND 상태 코드를 반환할 수 있습니다.
         if (memPhysical == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(memPhysical, HttpStatus.OK);
+        log.info("*************result : " + result);
+        return ResponseEntity.ok(result);
+    }
+
+    class OuterClass {
+
+        @Getter
+        @Setter
+        public static class PointData {
+
+            private double ear;
+            private double shoulder;
+            private double hip;
+            private double knee;
+
+        }
     }
 
 //    @DeleteMapping("/delete/{MEM_EMAIL}") //측정 정보 삭제하기
