@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.ict.gun.member.controller.MemberUtil.decodeToken;
@@ -93,6 +94,26 @@ public class MemberController {
         member.setMemBir(memBir);
         member.setMemActLevel(memActLevel);
         member.setMemEmail(memEmail);
+
+        //회원의 일일 권장 칼로리 계산
+        int mem_reco_daily_calories = 0;
+        //생일을 년도로만 포맷
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+        String formatDate = sdf.format(memBir);
+        //현재년도
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        //현재년도 - 생년 = 나이
+        int memberBirthday = (currentYear - (Integer.parseInt(formatDate)) +1);
+        if(memWeight > 0 && memHeight > 0 && memBir != null && memGen != null) {
+            if (memGen.equals("남자")) {
+                mem_reco_daily_calories = (int) ((66 + (13.7 * memWeight) + (5 * memHeight) - (6.5 * memberBirthday)) * memActLevel);
+                member.setMem_reco_daily_calories(mem_reco_daily_calories);
+            } else {
+                mem_reco_daily_calories = (int) ((655 + (9.6 * memWeight) + (1.8 * memHeight) - (4.7 * memberBirthday)) * memActLevel);
+                member.setMem_reco_daily_calories(mem_reco_daily_calories);
+            }
+        }
+
         log.info("member : " + member);
         String forderName = "member/" + emailToFolderName(memEmail);
         // log.info("forderName : "+forderName);
