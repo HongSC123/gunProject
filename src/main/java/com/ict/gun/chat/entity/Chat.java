@@ -19,7 +19,7 @@ import java.time.LocalDateTime; // 수정된 import
 public class Chat {
     @Email
     @Column(name ="\"MEM_EMAIL\"")
-    private String memEmail;
+    private String mem_email;
 
     @Column(name ="\"CHAT_FIX\"")
     private String chat_fix;
@@ -30,6 +30,9 @@ public class Chat {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") // Timestamp 형식에 맞게 변경
     @Column(name ="\"CHAT_DATE\"")
     private LocalDateTime chat_date; // LocalDateTime 타입으로 변경
+
+    @Column(name ="\"CHAT_TITLE\"")
+    private String chat_title;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "chat_seq")

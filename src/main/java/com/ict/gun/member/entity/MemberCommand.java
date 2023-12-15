@@ -33,5 +33,5 @@ public class MemberCommand{
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date memBir;
     @Transient
-    private int memActLevel;
+    private String memActLevel;
 }

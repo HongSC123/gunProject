@@ -12,8 +12,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.sql.Date;
+import java.util.Collection;
+import java.util.Collections;
 
 @Data
 @Table(name = "member")
@@ -22,7 +27,7 @@ import java.sql.Date;
 @NoArgsConstructor
 @Builder
 @DynamicInsert
-public class Member {
+public class Member implements UserDetails {
     @Id
     @Email
     @NotBlank
@@ -53,4 +58,48 @@ public class Member {
     @Column(name = "mem_act")
     private String memAct;
 
+    @Column(name="mem_aka")
+    private String memAka;
+
+    @Column(name="role")
+    private UserRole role;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority(role.name()));
+    }
+
+    @Override
+    public String getPassword() {
+        return memPw;
+    }
+
+    @Override
+    public String getUsername() {
+        return memEmail;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        // 사용자 계정 만료 여부 로직 구현
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        // 사용자 계정 잠김 여부 로직 구현
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        // 사용자 자격 증명(비밀번호) 만료 여부 로직 구현
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        // 사용자 계정 활성화 여부 로직 구현
+        return "Y".equals(memAct);
+    }
 }
