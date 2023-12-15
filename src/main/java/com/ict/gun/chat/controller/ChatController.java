@@ -31,6 +31,30 @@ public class ChatController {
     private ChatRepository chatRepository; // ChatRepository 주입
 
 
+//    @Transactional
+//    @CrossOrigin("http://localhost:8888")
+//    @PostMapping("/chatinsert")
+//    public ResponseEntity<String> insertChat(@RequestBody dataToSend dataToSend) {
+//        try {
+//            String userQuery = dataToSend.getChat_title();
+//            String aiResponse = dataToSend.getChat_content();
+//            String memEmail = dataToSend.getMemEmail();
+//
+//            Chat chat = new Chat();
+//            chat.setChat_title(userQuery);
+//            chat.setChat_content(aiResponse);
+//            chat.setChat_date(LocalDateTime.now());
+//            chat.setChat_fix("N");
+//            chat.setMem_email(memEmail);
+//
+//            chatService.saveChat(aiResponse, userQuery, memEmail);
+//
+//            return new ResponseEntity<>("성공적으로 저장되었습니다.", HttpStatus.CREATED);
+//        } catch (Exception e) {
+//            return new ResponseEntity<>("저장에 실패하였습니다. " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
+
     @Transactional
     @CrossOrigin("http://localhost:8888")
     @PostMapping("/chatinsert")
@@ -39,13 +63,6 @@ public class ChatController {
             String userQuery = dataToSend.getChat_title();
             String aiResponse = dataToSend.getChat_content();
             String memEmail = dataToSend.getMemEmail();
-
-            Chat chat = new Chat();
-            chat.setChat_title(userQuery);
-            chat.setChat_content(aiResponse);
-            chat.setChat_date(LocalDateTime.now());
-            chat.setChat_fix("N");
-            chat.setMem_email(memEmail);
 
             chatService.saveChat(aiResponse, userQuery, memEmail);
 
@@ -61,6 +78,19 @@ public class ChatController {
         try {
             // 이메일 값과 DB의 mem_email 값이 일치하는 데이터만을 가져오는 메소드 호출
             return chatService.getAllChats(memEmail);
+        } catch (Exception e) {
+            // 에러 로깅 혹은 필요한 예외 처리를 수행할 수 있습니다.
+            // 여기서는 간단하게 에러 메시지 출력 후 빈 리스트 반환합니다.
+            System.err.println("Failed to fetch chats for the user: " + e.getMessage());
+            return Collections.emptyList(); // 빈 리스트 반환
+        }
+    }
+
+    @GetMapping("/chatfixed")
+    public List<Chat> selectChatFixedList(@RequestParam("memEmail") String memEmail) {
+        try {
+            // 이메일 값과 DB의 mem_email 값이 일치하는 데이터만을 가져오는 메소드 호출
+            return chatService.getFixedChats(memEmail);
         } catch (Exception e) {
             // 에러 로깅 혹은 필요한 예외 처리를 수행할 수 있습니다.
             // 여기서는 간단하게 에러 메시지 출력 후 빈 리스트 반환합니다.

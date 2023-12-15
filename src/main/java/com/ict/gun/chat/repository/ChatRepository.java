@@ -17,9 +17,20 @@ import java.util.Optional;
 public interface ChatRepository extends CrudRepository<Chat, Long> {
 
 
+    @Query("SELECT c FROM Chat c WHERE c.mem_email = :memEmail and c.chat_fix = :chat_fix")
+    List<Chat> seekbyCondition(@Param("memEmail") String memEmail, @Param("chat_fix") String chat_fix);
+
+//    void deleteChat(@Param("chat_num") Long chat_num);
+
+    @Query("SELECT COUNT(c) FROM Chat c WHERE c.mem_email = :memEmail and c.chat_fix = :chat_fix")
+    int countByCondition(@Param("memEmail") String memEmail, @Param("chat_fix") String chat_fix);
+
+
     @Query("SELECT c FROM Chat c WHERE c.mem_email = :memEmail ORDER BY c.chat_num ASC")
     List<Chat> findAll(@Param("memEmail") String memEmail);
 
+    @Query("SELECT c FROM Chat c WHERE c.mem_email = :memEmail and c.chat_fix = 'Y' ORDER BY c.chat_num ASC")
+    List<Chat> findFixed(@Param("memEmail") String memEmail);
 
 
     @Query("SELECT COUNT(c) FROM Chat c WHERE c.mem_email = :memEmail")
