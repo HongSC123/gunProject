@@ -324,6 +324,7 @@ public class MemberController {
             result.put("result", "fail");
             return ResponseEntity.ok().body(result);
         }
+
         try {
             ProcessBuilder processBuilder = new ProcessBuilder( "E:/gun_workspace/gun/src/main/resources/faceModel/faceLoginCheck.exe","E:/gun_workspace/gun/src/main/resources/faceLoginInput/faceLoginInput.jpg");
             processBuilder.directory(new File("E:/gun_workspace/gun/src/main/resources/faceModel/"));
