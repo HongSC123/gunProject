@@ -18,19 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.sql.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.ict.gun.member.controller.MemberUtil.decodeToken;
 import static com.ict.gun.member.controller.MemberUtil.emailToFolderName;
@@ -315,22 +309,54 @@ public class MemberController {
         return memberRepository.findByRoleNot(UserRole.ADMIN);
     }
     @PostMapping("/login/face")
-    public ResponseEntity<String> loginFace(HttpServletRequest request){
+    public ResponseEntity<Map<String,String>> loginFace(@RequestBody Map<String, String> base64Image,HttpServletRequest request) {
+        String base64ImageStr = base64Image.get("image");
+        String memEmail = base64Image.get("email");
+        String photoEmail = "";
+        Map<String,String> result = new HashMap<>();
+        log.info("memEmail : " + memEmail);
+        byte[] imageBytes = Base64.getDecoder().decode(base64ImageStr);
+        String filePath = "E:/gun_workspace/gun/src/main/resources/faceLoginInput/faceLoginInput.jpg";
+        try (FileOutputStream fos = new FileOutputStream(filePath)) {
+            fos.write(imageBytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+            result.put("result", "fail");
+            return ResponseEntity.ok().body(result);
+        }
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder("python", "E:/third_project/OpenCV-Face.recognition-master/onefile.py","E:/third_project/OpenCV-Face.recognition-master/FaceFile");
+            ProcessBuilder processBuilder = new ProcessBuilder( "E:/gun_workspace/gun/src/main/resources/faceModel/faceLoginCheck.exe","E:/gun_workspace/gun/src/main/resources/faceLoginInput/faceLoginInput.jpg");
+            processBuilder.directory(new File("E:/gun_workspace/gun/src/main/resources/faceModel/"));
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
-            // 스트림 읽기
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while((line = reader.readLine()) != null) {
-                System.out.println(line);
+                photoEmail += line;
             }
             int exitCode = process.waitFor();
-            log.info("Exit code: " + exitCode);
-            return ResponseEntity.ok("success");
+            log.info("전송완");
+            if(memEmail.equals(photoEmail)){
+                Optional<Member> member = memberRepository.findById(memEmail);
+                log.info("로그인 성공");
+                String Token = JwtTokenUtil.createToken(member.get().getMemEmail(), secretKey, expiration);
+                String RefreshToken = JwtTokenUtil.createRefreshToken(member.get().getMemEmail(),secretKey, refreshTokenExpiration);
+                result.put("accessToken", Token);
+                result.put("refreshToken", RefreshToken);
+                result.put("role", member.get().getRole().toString());
+                TokenRedis tokenRedis = new TokenRedis(member.get().getMemEmail(), Token, RefreshToken, expiration, refreshTokenExpiration);
+                tokenRedisRepository.save(tokenRedis);
+                Optional<TokenRedis> token = tokenRedisRepository.findById(tokenRedis.getId());
+                result.put("result", "success");
+                return ResponseEntity.ok(result);
+            }else if(!memEmail.equals(photoEmail)){
+                result.put("result", "fail");
+                return ResponseEntity.ok(result);
+            }
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
     }
 }

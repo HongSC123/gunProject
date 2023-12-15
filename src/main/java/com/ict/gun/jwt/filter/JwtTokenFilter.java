@@ -66,9 +66,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
              log.info("isAccessToken : " + isAccessToken);
              log.info("isRefreshToken : " + isRefreshToken);
         }
-        if(authorizationHeader == null) {
-            log.info("헤더 없음");
-        }
+//        if(authorizationHeader == null) {
+//            log.info("헤더 없음");
+//        }
 
         if(Boolean.TRUE.equals(isAccessToken) && Boolean.TRUE.equals(isRefreshToken)) {
             response.sendError(DOUBLE_EXPIRED);
