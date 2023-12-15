@@ -17,7 +17,7 @@ import java.util.Optional;
 public interface ChatRepository extends CrudRepository<Chat, Long> {
 
 
-    @Query("SELECT c FROM Chat c WHERE c.mem_email = :memEmail and c.chat_fix = :chat_fix")
+    @Query("SELECT c FROM Chat c WHERE c.mem_email = :memEmail AND c.chat_fix = :chat_fix ORDER BY c.chat_num ASC")
     List<Chat> seekbyCondition(@Param("memEmail") String memEmail, @Param("chat_fix") String chat_fix);
 
 //    void deleteChat(@Param("chat_num") Long chat_num);
