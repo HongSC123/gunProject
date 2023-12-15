@@ -7,7 +7,6 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -18,17 +17,15 @@ public class QMemPhysical extends EntityPathBase<MemPhysical> {
 
     private static final long serialVersionUID = -125142828L;
 
-    private static final PathInits INITS = PathInits.DIRECT2;
-
     public static final QMemPhysical memPhysical1 = new QMemPhysical("memPhysical1");
 
     public final NumberPath<Long> memCount = createNumber("memCount", Long.class);
 
-    public final DatePath<java.time.LocalDate> memDeleteDate = createDate("memDeleteDate", java.time.LocalDate.class);
+    public final DatePath<java.sql.Date> memDeleteDate = createDate("memDeleteDate", java.sql.Date.class);
 
-    public final com.ict.gun.member.entity.QMember memEmail;
+    public final StringPath memEmail = createString("memEmail");
 
-    public final DatePath<java.time.LocalDate> memInputDate = createDate("memInputDate", java.time.LocalDate.class);
+    public final DatePath<java.sql.Date> memInputDate = createDate("memInputDate", java.sql.Date.class);
 
     public final StringPath memLocation = createString("memLocation");
 
@@ -41,24 +38,15 @@ public class QMemPhysical extends EntityPathBase<MemPhysical> {
     public final StringPath memPoint = createString("memPoint");
 
     public QMemPhysical(String variable) {
-        this(MemPhysical.class, forVariable(variable), INITS);
+        super(MemPhysical.class, forVariable(variable));
     }
 
     public QMemPhysical(Path<? extends MemPhysical> path) {
-        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
+        super(path.getType(), path.getMetadata());
     }
 
     public QMemPhysical(PathMetadata metadata) {
-        this(metadata, PathInits.getFor(metadata, INITS));
-    }
-
-    public QMemPhysical(PathMetadata metadata, PathInits inits) {
-        this(MemPhysical.class, metadata, inits);
-    }
-
-    public QMemPhysical(Class<? extends MemPhysical> type, PathMetadata metadata, PathInits inits) {
-        super(type, metadata, inits);
-        this.memEmail = inits.isInitialized("memEmail") ? new com.ict.gun.member.entity.QMember(forProperty("memEmail")) : null;
+        super(MemPhysical.class, metadata);
     }
 
 }

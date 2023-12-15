@@ -10,6 +10,7 @@ import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.sql.Date;
 import java.time.LocalDate;
 
 @Data
@@ -66,11 +67,11 @@ public class MemPhysicalDto {
                 .memLocation(memPhysicalDto.getMemLocation())
                 .memPoint(memPhysicalDto.getMemPoint())
                 .memCount(memPhysicalDto.getMemCount())
-                .memInputDate(memPhysicalDto.getMemInputDate())
-                .memDeleteDate(memPhysicalDto.getMemDeleteDate())
+                .memInputDate(Date.valueOf(memPhysicalDto.getMemInputDate()))
+                .memDeleteDate(Date.valueOf(memPhysicalDto.getMemDeleteDate()))
                 .memPhysicalAct(memPhysicalDto.getMemPhysicalAct())
                 .memPhysicalSet(memPhysicalDto.getMemPhysicalSet())
-                .memEmail(memPhysicalDto.getMemEmail())
+                .memEmail(String.valueOf(memPhysicalDto.getMemEmail()))
                 .build();
     }
 
