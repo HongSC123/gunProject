@@ -28,13 +28,13 @@ public class MemPhysicalService {
 
     //1개 조회
     public MemPhysical findByMemEmail (String email){
-        Member member = memberRepository.findByMemEmail(email);
+        Member member = memberRepository.findByMemEmail(email).get();
         return memPhysicalRepository.findByMemEmail(member);
         }
 
         //측정 정보 삭제
     public void memPhysicalDelete (String email){
-    Member member = memberRepository.findByMemEmail(email);
+    Member member = memberRepository.findByMemEmail(email).get();
     memPhysicalRepository.deleteByMemEmail(member);
     }
 
