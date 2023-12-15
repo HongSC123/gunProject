@@ -44,6 +44,7 @@ public class SecurityConfig {
                 .requestMatchers("/loader.css","/assets/**","/","/index.html", "/signup", "/css/**", "/js/**", "/images/**", "/favicon.ico", "/login","/newtoken","/loginkakao","/memoption","/changePassword","/profile","/admin/**","/login/face").permitAll()
                 .requestMatchers("/caloriedaylist/**", "/caloriedetail/**", "/caloriedaycalorie/**", "/calorietoday/**", "/calorieinsert","/ref","/ref/**").permitAll()
                 .requestMatchers("/chatinsert", "/chatrecent", "/chatcount", "/chatycount", "/chatupdate/**", "/recipe/chatdetail").authenticated()
+                .requestMatchers("/memPhysical/insert","/detail/physical").permitAll()
                 .requestMatchers("/tokencheck").hasAuthority(UserRole.ADMIN.name())
                 .anyRequest().authenticated()
                 .and()
