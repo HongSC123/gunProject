@@ -46,14 +46,14 @@ public class CalorieService {
     @Transactional
     public List<CalorieDto> searchDetailDietList(String mem_email, String selection_date){
 
-        // Timestamp를 String으로 변환
-        String strStartDate = dateFormat.format(selection_date);
+//        // Timestamp를 String으로 변환
+//        String strStartDate = dateFormat.format(selection_date);
+//
+//        String selected_Date = strStartDate.substring(0, 10);
 
-        String selected_Date = strStartDate.substring(0, 10);
+        log.info("timestamp형식을 변환한 String : " + selection_date);
 
-        log.info("timestamp형식을 변환한 String : " + selected_Date);
-
-        return calorieRepositoryCustomImpl.searchDetailDietList(mem_email, selected_Date);
+        return calorieRepositoryCustomImpl.searchDetailDietList(mem_email, selection_date);
     }
 
     //회원의 일일 권장 칼로리 조회
