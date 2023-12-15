@@ -1,10 +1,10 @@
 package com.ict.gun.chat.service;
 
-import com.ict.gun.chat.dto.FridgeInfoRequest;
 import com.ict.gun.chat.entity.Chat;
 import com.ict.gun.chat.repository.ChatRepository;
 import com.ict.gun.ref.data.repository.RefPhotoRepository;
 import com.ict.gun.ref.data.repository.RefRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class ChatService {
 
     @Autowired
@@ -119,6 +120,16 @@ public class ChatService {
         }
     }
 
+    public int getChatsearchCount(String memEmail) {
+        try {
+            return chatRepository.getsearchChatCount(memEmail);
+        } catch (Exception e) {
+            log.error("채팅 갯수를 불러오는데 실패했습니다.", e); // 예외 정보 전체를 로깅
+            return 0; // 예외 발생 시 0을 반환하도록 수정
+        }
+    }
+
+
     public int getChatYCount(String memEmail) {
         try {
             return chatRepository.getChatYCount(memEmail);
@@ -156,6 +167,15 @@ public class ChatService {
 
     public List<Chat> findChat(String searchTerm, String memEmail) {
         return chatRepository.findChat(searchTerm, memEmail);
+    }
+
+    public int getChatfindCount(String memEmail) {
+        try {
+            return chatRepository.getfindChatCount(memEmail);
+        } catch (Exception e) {
+            log.error("채팅 갯수를 불러오는데 실패했습니다.", e); // 예외 정보 전체를 로깅
+            return 0; // 예외 발생 시 0을 반환하도록 수정
+        }
     }
 
 //    public String getDietRecipeFromFridge(String email) {

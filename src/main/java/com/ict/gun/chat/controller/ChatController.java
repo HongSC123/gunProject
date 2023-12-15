@@ -151,6 +151,16 @@ public class ChatController {
         return chatService.searchChat(searchTerm, memEmail);
     }
 
+    @GetMapping("/chatsearchcount")
+    public int getChatsearchCount(@RequestParam("memEmail") String memEmail) {
+        try {
+            return chatService.getChatsearchCount(memEmail);
+        } catch (Exception e) {
+            log.error("글 갯수를 불러오는데 실패했습니다.", e); // 예외 정보 전체를 로깅
+            return 0; // 실패 시 0 반환 혹은 다른 적절한 방법으로 처리
+        }
+    }
+
     @GetMapping("/find")
     public List<Chat> findChat(@RequestParam(name = "searchTerm") String searchTerm,
                                  @RequestParam(name = "memEmail") String memEmail
@@ -159,6 +169,16 @@ public class ChatController {
         // 예를 들어, searchTerm과 memEmail을 이용하여 DB에서 검색을 수행하고 결과를 반환할 수 있습니다.
 
         return chatService.findChat(searchTerm, memEmail);
+    }
+
+    @GetMapping("/chatfindcount")
+    public int getChatfindCount(@RequestParam("memEmail") String memEmail) {
+        try {
+            return chatService.getChatfindCount(memEmail);
+        } catch (Exception e) {
+            log.error("글 갯수를 불러오는데 실패했습니다.", e); // 예외 정보 전체를 로깅
+            return 0; // 실패 시 0 반환 혹은 다른 적절한 방법으로 처리
+        }
     }
 
 //    @PostMapping("/fridgeinfo")
