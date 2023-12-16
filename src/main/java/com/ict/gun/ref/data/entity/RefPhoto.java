@@ -21,7 +21,7 @@ public class RefPhoto {
 
 //    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence_generator")
     @Id
-    private String REF_CODE;
+    private Long REF_CODE;
     private String REF_PHOTO;
     private Date REF_SAVE_DATE;
     private String MEM_EMAIL;

@@ -1,11 +1,10 @@
 package com.ict.gun.ref.controller;
 
 import com.ict.gun.ref.data.dto.RefDto;
-import com.ict.gun.ref.data.entity.Ref;
-import com.ict.gun.ref.data.entity.RefEx;
 import com.ict.gun.ref.data.repository.RefRepository;
 import com.ict.gun.ref.service.RefService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -14,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
+@Slf4j
 @RestController
 @RequestMapping("/ref")
 @RequiredArgsConstructor
@@ -24,20 +23,18 @@ public class RefController {
     private final RefService refService;
     private final RefRepository refRepository;
 
-    @GetMapping(value = "/list/{MEM_EMAIL}")
-    public ResponseEntity<List<RefDto>> getRefList(@PathVariable("MEM_EMAIL") String email) {
+    @GetMapping(value = "/list/{memEmail}")
+    public ResponseEntity<List<RefDto>> getRefList(@PathVariable("memEmail") String email) {
+        log.info("email : {}", email);
         List<RefDto> refList = refService.findByMyRefList(email);
         return ResponseEntity.ok(refList);
     }
 
-    @PostMapping("/searchRefEx")
-    public List<RefDto> searchRefEx(@RequestBody List<RefDto> refDto) {
-        return refService.searchRefEx(refDto);
-    }
-
     @PostMapping("/insert")
     public void insertRef(@RequestBody List<RefDto> refDto) {
-        logger.info("refDto : {}", refDto);
+        logger.info("exname : {}", refDto.get(0).getREF_NAME());
+        logger.info("enddate : {}", refDto.get(0).getREF_END_DATE());
+        logger.info("email : {}", refDto.get(0).getMEM_EMAIL());
             refService.insert(refDto);
     }
 
