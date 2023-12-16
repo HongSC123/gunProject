@@ -149,5 +149,7 @@ build/resources/main/static/
 
 .gradle/
 build/
+*.exe
+
 
 # End of https://www.toptal.com/developers/gitignore/api/vuejs,java,intellij+all,visualstudiocode
