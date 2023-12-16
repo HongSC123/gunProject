@@ -21,7 +21,7 @@ public class QRefPhoto extends EntityPathBase<RefPhoto> {
 
     public final StringPath MEM_EMAIL = createString("MEM_EMAIL");
 
-    public final StringPath REF_CODE = createString("REF_CODE");
+    public final NumberPath<Long> REF_CODE = createNumber("REF_CODE", Long.class);
 
     public final StringPath REF_PHOTO = createString("REF_PHOTO");
 
