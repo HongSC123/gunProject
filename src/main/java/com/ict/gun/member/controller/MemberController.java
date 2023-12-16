@@ -6,10 +6,12 @@ import com.ict.gun.jwt.token.entity.TokenRedis;
 import com.ict.gun.jwt.token.repositry.TokenRedisRepository;
 import com.ict.gun.jwt.util.JwtTokenUtil;
 import com.ict.gun.member.entity.Member;
+import com.ict.gun.member.entity.MemberCommand;
 import com.ict.gun.member.entity.MemberOptions;
 import com.ict.gun.member.entity.UserRole;
 import com.ict.gun.member.repository.MemberOptionRepository;
 import com.ict.gun.member.repository.MemberRepository;
+import com.ict.gun.member.repository.MemberRepositoryCustom;
 import com.ict.gun.member.service.MemberService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,6 +29,8 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static com.ict.gun.jwt.util.JwtTokenUtil.createRefreshToken;
+import static com.ict.gun.jwt.util.JwtTokenUtil.createToken;
 import static com.ict.gun.member.controller.MemberUtil.decodeToken;
 import static com.ict.gun.member.controller.MemberUtil.emailToFolderName;
 
@@ -40,6 +44,7 @@ public class MemberController {
     private final MemberRepository memberRepository;
     private final TokenRedisRepository tokenRedisRepository;
     private final MemberOptionRepository memberOptionRepository;
+    private final MemberRepositoryCustom memberRepositoryCustom;
 
     @Value("${application.security.jwt.secret-key}")
     String secretKey;
@@ -94,14 +99,6 @@ public class MemberController {
         member.setMemBir(memBir);
         member.setMemActLevel(memActLevel);
         member.setMemEmail(memEmail);
-
-        log.info("memGen : " + memGen);
-        log.info("memWeight : " + memWeight);
-        log.info("memHeight : " + memHeight);
-        log.info("memBir : " + memBir);
-        log.info("memActLevel : " + memActLevel);
-        log.info("memEmail : " + memEmail);
-
 
         //회원의 일일 권장 칼로리 계산
         int mem_reco_daily_calories = 0;
@@ -222,7 +219,7 @@ public class MemberController {
         if(!passwordEncoder.passwordEncoder().matches(member.getMemPw(), memberBase.get().getMemPw())){
             result.put("error", "802");
         }else{
-            String Token = JwtTokenUtil.createToken(member.getMemEmail(), secretKey, expiration);
+            String Token = createToken(member.getMemEmail(), secretKey, expiration);
             String RefreshToken = JwtTokenUtil.createRefreshToken(member.getMemEmail(),secretKey, refreshTokenExpiration);
             result.put("accessToken", Token);
             result.put("refreshToken", RefreshToken);
@@ -260,7 +257,7 @@ public class MemberController {
             Claims refreshToken = decodeToken(refresh, secretKey);
             String memEmail = refreshToken.get("loginId", String.class);
             log.info("memEmail : " + memEmail);
-            access = JwtTokenUtil.createToken(memEmail, secretKey, expiration);
+            access = createToken(memEmail, secretKey, expiration);
             TokenRedis newAccessToken = new TokenRedis(memEmail, access, refresh, expiration, refreshTokenExpiration);
 
             Optional<TokenRedis> token = tokenRedisRepository.findById(memEmail);
@@ -306,15 +303,16 @@ public class MemberController {
 
     @PostMapping("/loginkakao")
     public ResponseEntity<Map<String,String>> loginKakao(@RequestBody Map<String, String> kakaoInfo) {
-        String accessToken = kakaoInfo.get("accessToken");
-        String refreshToken = kakaoInfo.get("refreshToken");
+        String accessToken = createToken(kakaoInfo.get("memEmail"), secretKey, expiration);
+        String refreshToken = createRefreshToken(kakaoInfo.get("memEmail"), secretKey, refreshTokenExpiration);
         String memEmail = kakaoInfo.get("memEmail");
         Member kakaoMember = new Member();
         kakaoMember.setMemEmail(memEmail);
         kakaoMember.setMemType("KAKAO");
         kakaoMember.setRole(UserRole.USER);
         kakaoMember.setMemPw(memEmail);
-        if (memberRepository.findById(memEmail).get().getMemEn() != null) {
+        if (memberRepository.findById(memEmail).get().getMemEn() !=
+                null) {
             kakaoMember.setMemMod(new Date(System.currentTimeMillis()));
         } else {
             kakaoMember.setMemEn(new Date(System.currentTimeMillis()));
@@ -404,8 +402,19 @@ public class MemberController {
         }
     }
     @GetMapping("/admin/list")
-    public List<Member> adminList(){
-        return memberRepository.findByRoleNot(UserRole.ADMIN);
+    public List<MemberCommand> adminList(){
+        return memberRepositoryCustom.getMembers();
+    }
+    @PutMapping("/admin/update/{memEmail}")
+    public void adminUpdate(@PathVariable String memEmail){
+        Member member = memberRepository.findById(memEmail).get();
+        String nowAct = member.getMemAct();
+        if(nowAct.equals("Y")){
+            member.setMemAct("N");
+        }else{
+            member.setMemAct("Y");
+        }
+        memberRepository.save(member);
     }
     @PostMapping("/login/face")
     public ResponseEntity<Map<String,String>> loginFace(@RequestBody Map<String, String> base64Image,HttpServletRequest request) {
@@ -439,7 +448,7 @@ public class MemberController {
             if(memEmail.equals(photoEmail)){
                 Optional<Member> member = memberRepository.findById(memEmail);
                 log.info("로그인 성공");
-                String Token = JwtTokenUtil.createToken(member.get().getMemEmail(), secretKey, expiration);
+                String Token = createToken(member.get().getMemEmail(), secretKey, expiration);
                 String RefreshToken = JwtTokenUtil.createRefreshToken(member.get().getMemEmail(),secretKey, refreshTokenExpiration);
                 result.put("accessToken", Token);
                 result.put("refreshToken", RefreshToken);

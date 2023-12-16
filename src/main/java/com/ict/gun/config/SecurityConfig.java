@@ -41,11 +41,11 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtTokenFilter(userService, secretKey), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
 
-                .requestMatchers("/loader.css","/assets/**","/","/index.html", "/signup", "/css/**", "/js/**", "/images/**", "/favicon.ico", "/login","/newtoken","/loginkakao","/memoption","/changePassword","/profile","/admin/**","/login/face","/memoption2").permitAll()
+                .requestMatchers("/loader.css","/assets/**","/","/index.html", "/signup", "/css/**", "/js/**", "/images/**", "/favicon.ico", "/login","/newtoken","/loginkakao","/memoption","/changePassword","/profile","/admin/**","/login/face","/memoption2","/notice/**").permitAll()
                 .requestMatchers("/caloriedaylist/**", "/caloriedetail/**", "/caloriedaycalorie/**", "/calorietoday/**", "/calorieinsert","/ref","/ref/**").permitAll()
                 .requestMatchers("/chatinsert", "/chatrecent", "/chatcount", "/chatycount", "/chatupdate/**", "/recipe/chatdetail").authenticated()
                 .requestMatchers("/memPhysical/insert","/detail/physical").permitAll()
-                .requestMatchers("/tokencheck").hasAuthority(UserRole.ADMIN.name())
+                .requestMatchers("/tokencheck","/admin/update/**").hasAuthority(UserRole.ADMIN.name())
                 .anyRequest().authenticated()
                 .and()
                 .logout()

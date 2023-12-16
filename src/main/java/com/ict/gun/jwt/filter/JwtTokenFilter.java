@@ -34,19 +34,19 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, ServletException, IOException {
 
-        if (request.getHeader(HttpHeaders.AUTHORIZATION) != null  && request.getHeader(HttpHeaders.AUTHORIZATION).startsWith("Kakao ")) {
-            String loginId = request.getHeader("memEmail");
-            Member loginUser = userService.getLoginUserByLoginId(loginId);
-
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    loginUser.getMemEmail(), null, List.of(new SimpleGrantedAuthority(loginUser.getRole().name())));
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-            // 권한 부여
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            filterChain.doFilter(request, response);
-            return;
-        }
+//        if (request.getHeader(HttpHeaders.AUTHORIZATION) != null  && request.getHeader(HttpHeaders.AUTHORIZATION).startsWith("Kakao ")) {
+//            String loginId = request.getHeader("memEmail");
+//            Member loginUser = userService.getLoginUserByLoginId(loginId);
+//
+//            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+//                    loginUser.getMemEmail(), null, List.of(new SimpleGrantedAuthority(loginUser.getRole().name())));
+//            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//
+//            // 권한 부여
+//            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
 
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         String refreshToken = request.getHeader("refresh");
@@ -88,7 +88,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
 
         // Header의 Authorization 값이 'Bearer '로 시작하지 않으면 => 잘못된 토큰
-        if(!authorizationHeader.startsWith("Bearer ")) {
+        if(!authorizationHeader.startsWith("Bearer ") || !authorizationHeader.startsWith("Kakao ")) {
             filterChain.doFilter(request, response);
             return;
         }
