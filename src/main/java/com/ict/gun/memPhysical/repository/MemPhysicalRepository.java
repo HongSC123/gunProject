@@ -7,10 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface MemPhysicalRepository extends JpaRepository<MemPhysical, Long> {
 
-    MemPhysical findByMemEmail(String memEmail);
+    List<MemPhysical> findByMemEmail(@Param("memEmail") String memEmail);
 
 
 
@@ -23,7 +25,8 @@ public interface MemPhysicalRepository extends JpaRepository<MemPhysical, Long> 
 
 
 
-    void deleteByMemEmail(String memEmail);
+    void deleteByMemPhysical(Long memPhysical);
 
 
+    List<MemPhysical> findAllByMemEmail(String memEmail);
 }
