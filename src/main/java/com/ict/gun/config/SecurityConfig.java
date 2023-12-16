@@ -46,6 +46,8 @@ public class SecurityConfig {
                 .requestMatchers("/chatinsert", "/chatrecent", "/chatcount", "/chatycount", "/chatupdate/**", "/recipe/chatdetail").authenticated()
                 .requestMatchers("/memPhysical/insert","/detail/physical").permitAll()
                 .requestMatchers("/tokencheck","/admin/update/**").hasAuthority(UserRole.ADMIN.name())
+                .requestMatchers("/memPhysical/insert","/detail/physical","/memPhysical/delete/{MEM_PHYSICAL}","/list/physical").permitAll()
+                .requestMatchers("/tokencheck").hasAuthority(UserRole.ADMIN.name())
                 .anyRequest().authenticated()
                 .and()
                 .logout()
