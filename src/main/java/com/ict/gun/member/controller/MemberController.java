@@ -95,6 +95,14 @@ public class MemberController {
         member.setMemActLevel(memActLevel);
         member.setMemEmail(memEmail);
 
+        log.info("memGen : " + memGen);
+        log.info("memWeight : " + memWeight);
+        log.info("memHeight : " + memHeight);
+        log.info("memBir : " + memBir);
+        log.info("memActLevel : " + memActLevel);
+        log.info("memEmail : " + memEmail);
+
+
         //회원의 일일 권장 칼로리 계산
         int mem_reco_daily_calories = 0;
         //생일을 년도로만 포맷
@@ -129,6 +137,76 @@ public class MemberController {
         String result = "success";
         return ResponseEntity.ok(result);
     }
+
+    @PostMapping("/memoption2")
+    public ResponseEntity<String> memOption2(@RequestParam(name = "memGen", required = false) String memGen,
+                                            @RequestParam(name = "memWeight", required = false) float memWeight,
+                                            @RequestParam(name = "memHeight", required = false) float memHeight,
+                                            @RequestParam(name = "memBir", required = false) Date memBir,
+                                            @RequestParam(name = "memActLevel", required = false) Float memActLevel,
+                                            @RequestParam(name = "memEmail", required = false) String memEmail,
+                                            @RequestPart(name = "memPhoto", required = false) MultipartFile memPhoto) {
+        MemberOptions member = new MemberOptions();
+        FileHandler handler = new FileHandler();
+        Optional<Member> memberBase = memberRepository.findByMemEmail(memEmail);
+        if(memGen != null) {
+            member.setMemGen(memGen);
+        }
+        if(memWeight > 0) {
+            member.setMemWeight(memWeight);
+        }
+        if(memHeight > 0) {
+            member.setMemHeight(memHeight);
+        }
+        if(memBir != null) {
+            member.setMemBir(memBir);
+        }
+        if(memActLevel > 0) {
+            member.setMemActLevel(memActLevel);
+        }
+        if(memEmail != null) {
+            member.setMemEmail(memEmail);
+        }
+        log.info("member : " + member);
+
+
+        //회원의 일일 권장 칼로리 계산
+        int mem_reco_daily_calories = 0;
+        //생일을 년도로만 포맷
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+        if(memBir != null) {
+            String formatDate = sdf.format(memBir);
+            //현재년도
+            int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+            //현재년도 - 생년 = 나이
+            int memberBirthday = (currentYear - (Integer.parseInt(formatDate)) +1);
+            if(memWeight > 0 && memHeight > 0 && memBir != null && memGen != null) {
+                if (memGen.equals("남자")) {
+                    mem_reco_daily_calories = (int) ((66 + (13.7 * memWeight) + (5 * memHeight) - (6.5 * memberBirthday)) * memActLevel);
+                    member.setMem_reco_daily_calories(mem_reco_daily_calories);
+                } else {
+                    mem_reco_daily_calories = (int) ((655 + (9.6 * memWeight) + (1.8 * memHeight) - (4.7 * memberBirthday)) * memActLevel);
+                    member.setMem_reco_daily_calories(mem_reco_daily_calories);
+                }
+            }
+        }
+        if(memPhoto != null) {
+            String forderName = "member/" + emailToFolderName(memEmail);
+            // log.info("forderName : "+forderName);
+            if(handler.handleFileUpload(memPhoto, forderName)){
+                memberBase.get().setMemPhoto(forderName+"/"+memPhoto.getOriginalFilename());
+            }else{
+                memberBase.get().setMemPhoto("default");
+            }
+        }
+        memberRepository.save(memberBase.get());
+        memberService.saveOption(member);
+        String result = "success";
+        return ResponseEntity.ok(result);
+    }
+
+
+
 
     @PostMapping("/login")
     public ResponseEntity<Map<String,String>> login(@RequestBody Member member) {

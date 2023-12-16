@@ -18,35 +18,21 @@ public class MemPhysicalService {
     private final MemberRepository memberRepository;
 
 
-
     public void save(MemPhysical memPhysical) {
         log.info("2");
         memPhysicalRepository.save(memPhysical);
     }
 
 
-
     //1개 조회
-    public MemPhysical findByMemEmail (String email){
+    public MemPhysical findByMemEmail(String memEmail) {
+        return memPhysicalRepository.findTopByMemEmailOrderByMemPhysicalDesc(memEmail);
+    }
+
+    //측정 정보 삭제
+    public void memPhysicalDelete(String email) {
         Member member = memberRepository.findByMemEmail(email).get();
-        return memPhysicalRepository.findByMemEmail(member);
-        }
-
-        //측정 정보 삭제
-    public void memPhysicalDelete (String email){
-    Member member = memberRepository.findByMemEmail(email).get();
-    memPhysicalRepository.deleteByMemEmail(member);
+        memPhysicalRepository.deleteByMemEmail(email);
     }
 
-    //public MemPhysical create(MemPhysicalRepository memPhysicalRepository) {
-    //    MemPhysical entity = MemPhysical.builder()
-    //            .memPhysical(memPhysicalRepository.getMemPhysical())
-    //            .memLocation(memPhysicalRepository.getMemLocation())
-    //            .memPoint(memPhysicalRepository.getMemPoint())
-    //            .memCount(memPhysicalRepository.getMemCount())
-    //            .memInputDate(memPhysicalRepository.getMemInputDate())
-    //            .build();
-    //    return memPhysicalRepository.save(entity);
-    //}
-    }
-
+}
