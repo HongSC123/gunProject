@@ -175,8 +175,7 @@ public class CalorieRepositoryCustomImpl implements CalorieRepositoryCustom {
     //오늘 먹은 칼로리와 섭취된 영양정보 조회하기
     @Override
     public Optional<CalorieDto> searchTodayCalorie(String mem_email, String now_date_time) {
-        log.info("IMPL로 오는 String 날짜 값 : " + now_date_time);
-        now_date_time = "23/12/05";
+
         Tuple tupple = queryFactory
                 .select(
                         id.ingest_calorie.sum(), nf.carbohydrate.sum(), nf.protein.sum(), nf.fat.sum()
@@ -197,5 +196,16 @@ public class CalorieRepositoryCustomImpl implements CalorieRepositoryCustom {
         }else {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public float searchFoodCalorie(String nutrition_num) {
+        Float query = queryFactory
+                .select(nf.kcal)
+                .from(nf)
+                .leftJoin(id).on(id.nutrition_num.eq(nf.nutrition_num))
+                .where(nf.nutrition_num.eq(nutrition_num))
+                .fetchFirst();
+        return query;
     }
 }
