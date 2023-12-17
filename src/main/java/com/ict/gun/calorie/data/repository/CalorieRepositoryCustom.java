@@ -16,4 +16,5 @@ public interface CalorieRepositoryCustom {
     List<CalorieDto> searchDetailDietList(String mem_email, String selected_date);
     int searchMemberDailyCalories(String mem_email);
     Optional<CalorieDto> searchTodayCalorie(String mem_email, String now_date_time);
+    float searchFoodCalorie(String nutrition_num);
 }

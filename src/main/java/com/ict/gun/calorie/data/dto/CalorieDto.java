@@ -1,5 +1,6 @@
 package com.ict.gun.calorie.data.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ict.gun.calorie.data.entity.IngestDiet;
 import com.ict.gun.calorie.data.entity.NutritionFact;
 import lombok.*;
@@ -11,14 +12,22 @@ import java.sql.Timestamp;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class CalorieDto {
+
     private Long diet_num;
+    @JsonProperty("foodPhoto")
     private String food_image;
+    @JsonProperty("foodQuan")
+    private int food_quan;
     private String registration_date_ymd;
     private String registration_date_hm;
     private Long ingest_calorie;
+    @JsonProperty("mem_email")
     private String mem_email;
     private String nutrition_num;
+    @JsonProperty("foodName")
     private String food_name;
     private Float weight;
     private Float kcal;
@@ -40,6 +49,7 @@ public class CalorieDto {
         return IngestDiet.builder()
                 .diet_num(ingestDiet.getDiet_num())
                 .food_image(ingestDiet.getFood_image())
+                .food_quan(ingestDiet.getFood_quan())
                 .registration_date_ymd(ingestDiet.getRegistration_date_ymd())
                 .registration_date_hm(ingestDiet.getRegistration_date_hm())
                 .ingest_calorie(ingestDiet.getIngest_calorie())
