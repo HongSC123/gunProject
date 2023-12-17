@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -36,7 +38,6 @@ import static com.ict.gun.member.controller.MemberUtil.emailToFolderName;
 
 @Slf4j
 @RequiredArgsConstructor
-@CrossOrigin
 @RestController
 public class MemberController {
     private final MemberService memberService;
@@ -350,8 +351,7 @@ public class MemberController {
     @GetMapping("/profile")
     public ResponseEntity<Map<String,Object>> profile(HttpServletRequest request) {
         if(request.getHeader("loginType").equals("KAKAO")){
-            String memEmail = request.getHeader("memEmail");
-            return ResponseEntity.ok().body(getProfile(memEmail));
+            return ResponseEntity.ok().body(getProfile(request.getHeader("memEmail")));
         }else{
             return ResponseEntity.ok().body(getProfile(decodeToken(request.getHeader(HttpHeaders.AUTHORIZATION).split(" ")[1], secretKey).get("loginId", String.class)));
         }
@@ -375,7 +375,7 @@ public class MemberController {
         result.put("memHeight", memberOptions.getMemHeight());
         result.put("memBir", memberOptions.getMemBir());
         result.put("memActLevel", memberOptions.getMemActLevel());
-
+        result.put("memAct", member.get().getMemAct());
         return result;
     }
 
@@ -467,5 +467,38 @@ public class MemberController {
         }
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+    }
+
+    @GetMapping("/loginnaver")
+    public ResponseEntity<String> loginNaver(HttpServletRequest request){
+        log.info("naver");
+        return ResponseEntity.ok(getNaverReqUrl(request));
+    }
+
+    public String getNaverReqUrl(HttpServletRequest request){
+        String clientId = "f1BG7G9EyIydwNiBcpjq";
+        String redirectUrl = "http://localhost:8888/login/naver";
+        String state = generateState();
+
+        String reqUrl = "https://nid.naver.com/oauth2.0/authorize" +
+                "?response_type=code" +
+                "&client_id=" + clientId +
+                "&redirect_uri=" + redirectUrl +
+                "&state=" + state;
+        request.getSession().setAttribute("state", state);
+        return reqUrl;
+    }
+    public String generateState() {
+        return new BigInteger(130, new SecureRandom()).toString(32);
+    }
+
+    @PatchMapping("/emailok")
+    public void emailOk(HttpServletRequest request){
+
+        String memEmail = request.getHeader("memEmail");
+        Optional<Member> member = memberRepository.findById(memEmail);
+        member.get().setMemAct("M");
+        memberRepository.save(member.get());
+
     }
 }

@@ -52,13 +52,14 @@ public class NoticeController {
         return ResponseEntity.ok("success");
     }
     @PatchMapping("/update")
-    public ResponseEntity<String> updateNotice(@RequestParam("noticeNum") long noticeNum,
+    public ResponseEntity<String> updateNotice(@RequestParam("noticeNum") int noticeNum,
                                                @RequestParam(name = "adminId", required = false) String adminId,
                                                @RequestParam(name = "noticeTitle", required = false) String noticeTitle,
                                                @RequestParam(name = "noticeCon", required = false) String noticeCon,
                                                @RequestParam(name = "noticeFile", required = false) MultipartFile noticeFile) {
         FileHandler handler = new FileHandler();
         Notice notice = noticeService.getNotice(noticeNum);
+        log.info("notice : {}", notice);
         notice.setAdminId(adminId);
         notice.setNoticeTitle(noticeTitle);
         notice.setNoticeCon(noticeCon);
@@ -86,12 +87,12 @@ public class NoticeController {
     }
 
     @GetMapping("/detail/{noticeNum}")
-    public Notice getNotice(@PathVariable("noticeNum") long noticeNum) {
+    public Notice getNotice(@PathVariable("noticeNum") int noticeNum) {
         return noticeService.getNotice(noticeNum);
     }
 
-    @PatchMapping("/delete")
-    public void deleteNotice(@RequestParam("noticeNum") long noticeNum) {
+    @PatchMapping("/delete/{noticeNum}")
+    public void deleteNotice(@PathVariable("noticeNum") int noticeNum) {
         Notice notice = noticeService.findById(noticeNum);
         notice.setNoticeDelDate(new Date(System.currentTimeMillis()));
         noticeService.updateNotice(notice);

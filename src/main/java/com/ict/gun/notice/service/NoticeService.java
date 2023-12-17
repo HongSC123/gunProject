@@ -17,7 +17,7 @@ import java.util.List;
 public class NoticeService {
     private final NoticeRepository noticeRepository;
     public List<Notice> getNoticeList() {
-        return noticeRepository.findAll();
+        return noticeRepository.findByNoticeDelDateIsNullOrderByNoticeNumDesc();
     }
 
     public void insertNotice(Notice notice) {

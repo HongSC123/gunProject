@@ -28,9 +28,7 @@ public class EmailController {
                 .to(emailPostDto.getEmail())
                 .subject("[건강을부탁해] 임시 비밀번호 발급")
                 .build();
-
         emailService.sendMail(emailMessage, "password");
-
         return ResponseEntity.ok().build();
     }
 
@@ -45,10 +43,7 @@ public class EmailController {
 
         String code = emailService.sendMail(emailMessage, "email");
         log.info("code : " + code);
-//        EmailResponseDto emailResponseDto = new EmailResponseDto();
-//        emailResponseDto.setCode(code);
-//
-//        return ResponseEntity.ok(emailResponseDto);
+        // 인증을 위한 code 값
         return code;
 
     }

@@ -34,6 +34,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
         httpSecurity
+                .cors().and()
                 .httpBasic().disable()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -41,7 +42,7 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtTokenFilter(userService, secretKey), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
 
-                .requestMatchers("/loader.css","/assets/**","/","/index.html", "/signup", "/css/**", "/js/**", "/images/**", "/favicon.ico", "/login","/newtoken","/loginkakao","/memoption","/changePassword","/profile","/admin/**","/login/face","/memoption2","/notice/**").permitAll()
+                .requestMatchers("/loader.css","/assets/**","/","/index.html", "/signup", "/css/**", "/js/**", "/images/**", "/favicon.ico", "/login","/newtoken","/loginkakao","/memoption","/changePassword","/profile","/admin/**","/login/face","/memoption2","/notice/**","/loginnaver","/email/{email}","/emailok").permitAll()
                 .requestMatchers("/caloriedaylist/**", "/caloriedetail/**", "/caloriedaycalorie/**", "/calorietoday/**", "/calorieinsert","/ref","/ref/**").permitAll()
                 .requestMatchers("/chatinsert", "/chatrecent", "/chatcount", "/chatycount", "/chatupdate/**", "/recipe/chatdetail").authenticated()
                 .requestMatchers("/memPhysical/insert","/detail/physical").permitAll()
