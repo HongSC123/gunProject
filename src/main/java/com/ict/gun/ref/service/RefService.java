@@ -37,22 +37,15 @@ public class RefService {
                     // 이미지 불러오기
                     BufferedImage originalImage = ImageIO.read(new File(r.getREF_PHOTO()));
 
-                    // 이미지 리사이징
-                    Image tmp = originalImage.getScaledInstance(40, 40, Image.SCALE_SMOOTH);
-                    BufferedImage resizedImage = new BufferedImage(40, 40, BufferedImage.TYPE_INT_ARGB);
-                    Graphics2D g2d = resizedImage.createGraphics();
-                    g2d.drawImage(tmp, 0, 0, null);
-                    g2d.dispose();
-
                     // 이미지를 Base64로 인코딩
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    ImageIO.write(resizedImage, "png", baos);
+                    ImageIO.write(originalImage, "jpg", baos);
                     byte[] bytes = baos.toByteArray();
                     String base64Image = Base64.getEncoder().encodeToString(bytes);
 
                     // Base64 인코딩된 이미지를 저장
                     r.setREF_PHOTO(base64Image);
-                    log.info("이미지 저장 : {}",r.getREF_CODE());
+                    log.info("이미지 담기 : {}",r.getREF_CODE());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -95,9 +88,11 @@ public class RefService {
     }
 
     public RefDto update(RefDto refDto) {
+        log.info("update_ref_code : {}", refDto.getREF_CODE());
+        long refCode = refDto.getREF_CODE();
         Ref ref = refDto.toEntity(refDto);
-        RefPhoto refPhoto = refDto.toEntityPhoto(refDto);
-        refPhotoRepository.save(refPhoto);
+        ref.setREF_CODE(refRepository.findByRefNum(ref.getREF_NUM()));
+        log.info("update_ref : {}", ref);
         refRepository.save(ref);
         return refDto;
     }
@@ -105,6 +100,7 @@ public class RefService {
     public void delete(Long refNum) {
         Ref ref = new Ref();
         ref.setREF_NUM(refNum);
+        log.info("ref : {}", ref);
         refRepository.delete(ref);
     }
 
@@ -114,11 +110,34 @@ public class RefService {
             refRepository.deleteAllByREF_CODE(Long.valueOf(refCode));
             refPhoto.setREF_CODE(Long.valueOf(refCode));
             refPhotoRepository.delete(refPhoto);
+            File file = new File("E:/gun_workspace/gun/src/main/resources/ref/" + refCode + ".jpg");
         }else if(refRepository.findByRefCode(Long.valueOf(refCode)) == 0){
             refPhoto.setREF_CODE(Long.valueOf(refCode));
             refPhotoRepository.delete(refPhoto);
+            File file = new File("E:/gun_workspace/gun/src/main/resources/ref/" + refCode + ".jpg");
         }else if(refPhotoRepository.findPhotoByRefCode(Long.valueOf(refCode)) == 0){
             throw new IllegalArgumentException("삭제할 정보가 없습니다.");
         }
+    }
+
+    public RefDto findBydetail(Long refNum) {
+        RefDto r = refRepository.findBydetail(refNum);
+        try {
+            // 이미지 불러오기
+            BufferedImage originalImage = ImageIO.read(new File(r.getREF_PHOTO()));
+
+            // 이미지를 Base64로 인코딩
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(originalImage, "jpg", baos);
+            byte[] bytes = baos.toByteArray();
+            String base64Image = Base64.getEncoder().encodeToString(bytes);
+
+            // Base64 인코딩된 이미지를 저장
+            r.setREF_PHOTO(base64Image);
+            log.info("이미지 담기 : {}",r.getREF_CODE());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return r;
     }
 }

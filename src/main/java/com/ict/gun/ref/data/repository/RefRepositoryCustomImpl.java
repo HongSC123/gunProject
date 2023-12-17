@@ -82,4 +82,42 @@ public class RefRepositoryCustomImpl implements RefRepositoryCustom {
                 .where(refPhoto.REF_CODE.eq(refCode))
                 .fetch().size();
     }
+
+    @Override
+    public RefDto findBydetail(Long refNum) {
+        JPAQuery<Tuple> query = queryFactory
+                .select(
+                        ref.REF_CODE,
+                        refPhoto.REF_PHOTO,
+                        refPhoto.REF_SAVE_DATE,
+                        refPhoto.MEM_EMAIL,
+                        ref.REF_NAME,
+                        ref.REF_QUAN,
+                        ref.REF_END_DATE,
+                        ref.REF_NUM
+                )
+                .from(ref)
+                .join(refPhoto).on(ref.REF_CODE.eq(refPhoto.REF_CODE))
+                .where(ref.REF_NUM.eq(refNum));
+
+        return query.fetchJoin().fetch().stream().map(tupple -> RefDto.builder()
+                .REF_CODE(tupple.get(ref.REF_CODE))
+                .REF_PHOTO(tupple.get(refPhoto.REF_PHOTO))
+                .REF_NAME(tupple.get(ref.REF_NAME))
+                .REF_SAVE_DATE(tupple.get(refPhoto.REF_SAVE_DATE))
+                .MEM_EMAIL(tupple.get(refPhoto.MEM_EMAIL))
+                .REF_QUAN(tupple.get(ref.REF_QUAN))
+                .REF_END_DATE(tupple.get(ref.REF_END_DATE))
+                .REF_NUM(tupple.get(ref.REF_NUM))
+                .build()).toList().get(0);
+    }
+
+    @Override
+    public Long findByRefNum(Long refNum) {
+        return queryFactory
+                .select(ref.REF_CODE)
+                .from(ref)
+                .where(ref.REF_NUM.eq(refNum))
+                .fetchOne();
+    }
 }
