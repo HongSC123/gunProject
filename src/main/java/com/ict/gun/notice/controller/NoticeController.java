@@ -39,7 +39,7 @@ public class NoticeController {
                 .build();
         log.info("notice : {}", notice);
         String folderName = "notice";
-        if(handler.handleFileUpload(noticeFile, folderName)) {
+        if(handler.handleFileUpload(noticeFile, folderName, adminId)) {
             notice.setNoticeFile(folderName + "/" + noticeFile.getOriginalFilename());
         }else{
             notice.setNoticeFile(null);
@@ -66,7 +66,7 @@ public class NoticeController {
         notice.setNoticeModDate(new Date(System.currentTimeMillis()));
         log.info("notice : {}", notice);
         String folderName = "notice";
-        if(handler.handleFileUpload(noticeFile, folderName)) {
+        if(handler.handleFileUpload(noticeFile, folderName, adminId)) {
             notice.setNoticeFile(folderName + "/" + noticeFile.getOriginalFilename());
         }else{
             notice.setNoticeFile(null);

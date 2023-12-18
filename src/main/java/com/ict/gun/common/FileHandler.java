@@ -1,6 +1,7 @@
 package com.ict.gun.common;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -27,9 +28,9 @@ public class FileHandler {
      * */
 
     private final String pathBase = "E:/gun_workspace/gun/src/main/resources";
+    private final String faceLogin = "E:/gun_workspace/gun/src/main/resources";
 
-
-    public boolean handleFileUpload(MultipartFile file, String folderName) {
+    public boolean handleFileUpload(MultipartFile file, String folderName,String memEmail) {
         boolean result = false;
         if (file != null && !file.isEmpty()) {
             try {
@@ -38,12 +39,21 @@ public class FileHandler {
                 String filePath = uploadFolderPath + File.separator + file.getOriginalFilename();
                 log.info("file path : " + filePath);
                 file.transferTo(new File(filePath));
+
+                String destinationPath = faceLogin;
+                File destinationFolder = new File(faceLogin);
+                if (!destinationFolder.exists()) {
+                    destinationFolder.mkdirs();
+                }
+                String destinationFilePath = destinationPath + File.separator + file.getOriginalFilename();
+                FileUtils.copyFile(new File(filePath), new File(destinationFilePath));
+
                 result = true;
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
 
+        }
         return result;
     }
 

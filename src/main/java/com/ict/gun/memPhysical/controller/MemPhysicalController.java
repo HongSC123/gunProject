@@ -52,7 +52,7 @@ public class MemPhysicalController {
         memPhysicalService.save(mem_physical);
         FileHandler handler = new FileHandler();
         String phyPhotoDir = "/physical";
-        if(handler.handleFileUpload(memPhysical,phyPhotoDir)){
+        if(handler.handleFileUpload(memPhysical,phyPhotoDir,memEmail)){
             try {
                 String[] command = {
                         "E:/gun_workspace/gun/src/main/resources/keypoints/keypoints.exe",

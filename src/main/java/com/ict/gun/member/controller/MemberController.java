@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.file.Files;
 import java.security.SecureRandom;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
@@ -123,7 +124,7 @@ public class MemberController {
         log.info("member : " + member);
         String forderName = "member/" + emailToFolderName(memEmail);
         // log.info("forderName : "+forderName);
-        if(handler.handleFileUpload(memPhoto, forderName)){
+        if(handler.handleFileUpload(memPhoto, forderName,memEmail)){
             memberBase.get().setMemPhoto(forderName+"/"+memPhoto.getOriginalFilename());
         }else{
             memberBase.get().setMemPhoto("default");
@@ -143,7 +144,7 @@ public class MemberController {
                                             @RequestParam(name = "memBir", required = false) Date memBir,
                                             @RequestParam(name = "memActLevel", required = false) Float memActLevel,
                                             @RequestParam(name = "memEmail", required = false) String memEmail,
-                                            @RequestPart(name = "memPhoto", required = false) MultipartFile memPhoto) {
+                                            @RequestPart(name = "memPhoto", required = false) MultipartFile memPhoto) throws IOException {
         MemberOptions member = new MemberOptions();
         FileHandler handler = new FileHandler();
         Optional<Member> memberBase = memberRepository.findByMemEmail(memEmail);
@@ -191,7 +192,7 @@ public class MemberController {
         if(memPhoto != null) {
             String forderName = "member/" + emailToFolderName(memEmail);
             // log.info("forderName : "+forderName);
-            if(handler.handleFileUpload(memPhoto, forderName)){
+            if(handler.handleFileUpload(memPhoto, forderName, memEmail)){
                 memberBase.get().setMemPhoto(forderName+"/"+memPhoto.getOriginalFilename());
             }else{
                 memberBase.get().setMemPhoto("default");
@@ -211,6 +212,15 @@ public class MemberController {
         log.info("member : " + member);
         Optional<Member> memberBase = memberRepository.findByMemEmail(member.getMemEmail());
         Map<String,String> result = new HashMap<>();
+
+        if(memberBase.get().getMemAct().equals("N")){
+            result.put("error", "805");
+            return ResponseEntity.ok().body(result);
+        }
+        if(memberBase.get().getMemQuit() != null){
+            result.put("error", "804");
+            return ResponseEntity.ok().body(result);
+        }
         if(memberBase.isEmpty()){
             result.put("error", "801");
         }
@@ -500,5 +510,14 @@ public class MemberController {
         member.get().setMemAct("M");
         memberRepository.save(member.get());
 
+    }
+
+    @PatchMapping("/updelete")
+    public void updelete(HttpServletRequest request){
+
+        String memEmail = request.getHeader("memEmail");
+        Optional<Member> member = memberRepository.findById(memEmail);
+        member.get().setMemQuit(new Date(System.currentTimeMillis()));
+        memberRepository.save(member.get());
     }
 }
