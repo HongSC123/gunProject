@@ -23,6 +23,8 @@ public class QIngestDiet extends EntityPathBase<IngestDiet> {
 
     public final StringPath food_image = createString("food_image");
 
+    public final NumberPath<Integer> food_quan = createNumber("food_quan", Integer.class);
+
     public final NumberPath<Long> ingest_calorie = createNumber("ingest_calorie", Long.class);
 
     public final StringPath mem_email = createString("mem_email");
