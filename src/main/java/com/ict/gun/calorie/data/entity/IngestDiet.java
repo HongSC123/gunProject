@@ -26,6 +26,9 @@ public class IngestDiet {
     @Column(name = "FOOD_IMAGE")
     private String food_image;
 
+    @Column(name = "FOOD_QUAN")
+    private int food_quan;
+
     @Column(name = "REGISTRATION_DATE_YMD")
     private String registration_date_ymd;
 
@@ -45,6 +48,7 @@ public class IngestDiet {
         return CalorieDto.builder()
                 .diet_num(this.diet_num)
                 .food_image(this.food_image)
+                .food_quan(this.food_quan)
                 .registration_date_ymd(this.registration_date_ymd)
                 .registration_date_hm(this.registration_date_hm)
                 .ingest_calorie(this.ingest_calorie)
