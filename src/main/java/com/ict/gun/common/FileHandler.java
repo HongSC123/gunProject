@@ -31,19 +31,13 @@ public class FileHandler {
 
     public boolean handleFileUpload(MultipartFile file, String folderName) {
         boolean result = false;
-        // log.info("folderName : " + folderName);
         if (file != null && !file.isEmpty()) {
             try {
-                // 업로드될 폴더 경로 생성
                 String uploadFolderPath = createUploadFolderPath(folderName);
                 log.info("uploadFolderPath : "+uploadFolderPath);
-                // 파일 저장 경로 생성
                 String filePath = uploadFolderPath + File.separator + file.getOriginalFilename();
                 log.info("file path : " + filePath);
-                // 파일 저장
                 file.transferTo(new File(filePath));
-
-                // 파일 저장 성공시 결과를 true로 설정
                 result = true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -54,17 +48,14 @@ public class FileHandler {
     }
 
     private String createUploadFolderPath(String folderName) {
-        // 업로드 기본 경로와 폴더 이름을 결합하여 폴더 경로 생성
         String uploadFolderPath = pathBase + File.separator + folderName;
         log.info("pathBase : "+pathBase);
         log.info("folderName : "+folderName);
         log.info("uploadFolderPath : "+uploadFolderPath);
-        // 폴더가 존재하지 않으면 생성
         File folder = new File(uploadFolderPath);
         if (!folder.exists()) {
             folder.mkdirs();
         }
-
         return uploadFolderPath;
     }
 }
