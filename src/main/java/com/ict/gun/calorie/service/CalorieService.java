@@ -4,15 +4,21 @@ import com.ict.gun.calorie.data.dto.CalorieDto;
 import com.ict.gun.calorie.data.entity.IngestDiet;
 import com.ict.gun.calorie.data.repository.CalorieRepository;
 import com.ict.gun.calorie.data.repository.CalorieRepositoryCustomImpl;
+import com.ict.gun.ref.data.dto.RefDto;
+import com.ict.gun.ref.data.entity.RefPhoto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -70,17 +76,111 @@ public class CalorieService {
 
     //새로운 음식 등록
     @Transactional
-    public IngestDiet insertCalorie(IngestDiet ingestDiet){
+    public IngestDiet insertCalorie(CalorieDto calorieDto){
+
+        long randomLong = new Random().nextLong();
+//        calorieDto.get(0).setREF_CODE(randomLong);
+//        calorieDto.get(0).setRegistration_date_hm(new Date());
+        String encodedString = calorieDto.getFood_image();
+        byte[] decodedBytes = Base64.getDecoder().decode(encodedString);
+        String fileName = "E:/gun_workspace/gun/src/main/resources/food/" + randomLong + ".jpg";
+        log.info("fileName : {}", fileName);
+        try {
+            Files.write(Paths.get(fileName), decodedBytes);
+            calorieDto.setFood_image(fileName);
+        } catch (IOException e) {
+            log.error("파일 쓰기 에러러러러", e);
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        String formattedNow1 = now.format(formatter1);
+
+        String format1 = formattedNow1.substring(0, 10);
+        String format2 = formattedNow1.substring(11, 16);
+
+        calorieDto.setRegistration_date_ymd(format1);
+        calorieDto.setRegistration_date_hm(format2);
+
+
+        if(calorieDto.getFood_name().equals("Black_bean_sauce_noodles")){
+            calorieDto.setNutrition_num("3");
+            float result = calorieRepositoryCustomImpl.searchFoodCalorie("3");
+            long myLong = Math.round(result);
+            int su = calorieDto.getFood_quan();
+            calorieDto.setIngest_calorie(myLong * su);
+        } else if (calorieDto.getFood_name().equals("Steamed_rice")) {
+            calorieDto.setNutrition_num("1");
+            float result = calorieRepositoryCustomImpl.searchFoodCalorie("1");
+            long myLong = Math.round(result);
+            int su = calorieDto.getFood_quan();
+            calorieDto.setIngest_calorie(myLong * su);
+        } else if (calorieDto.getFood_name().equals("Beef_radish_soup")) {
+            calorieDto.setNutrition_num("5");
+            float result = calorieRepositoryCustomImpl.searchFoodCalorie("5");
+            long myLong = Math.round(result);
+            int su = calorieDto.getFood_quan();
+            calorieDto.setIngest_calorie(myLong * su);
+        } else if (calorieDto.getFood_name().equals("Curry_Rice")) {
+            calorieDto.setNutrition_num("2");
+            float result = calorieRepositoryCustomImpl.searchFoodCalorie("2");
+            long myLong = Math.round(result);
+            int su = calorieDto.getFood_quan();
+            calorieDto.setIngest_calorie(myLong * su);
+        } else if (calorieDto.getFood_name().equals("Chicken_porridge")) {
+            calorieDto.setNutrition_num("4");
+            float result = calorieRepositoryCustomImpl.searchFoodCalorie("4");
+            long myLong = Math.round(result);
+            int su = calorieDto.getFood_quan();
+            calorieDto.setIngest_calorie(myLong * su);
+        } else if (calorieDto.getFood_name().equals("Seasoned_spinach")) {
+            calorieDto.setNutrition_num("8");
+            float result = calorieRepositoryCustomImpl.searchFoodCalorie("8");
+            long myLong = Math.round(result);
+            int su = calorieDto.getFood_quan();
+            calorieDto.setIngest_calorie(myLong * su);
+        } else if (calorieDto.getFood_name().equals("Stir-fried_Rice_Cake")) {
+            calorieDto.setNutrition_num("6");
+            float result = calorieRepositoryCustomImpl.searchFoodCalorie("6");
+            long myLong = Math.round(result);
+            int su = calorieDto.getFood_quan();
+            calorieDto.setIngest_calorie(myLong * su);
+        } else if (calorieDto.getFood_name().equals("Pork_cutlet")) {
+            calorieDto.setNutrition_num("7");
+            float result = calorieRepositoryCustomImpl.searchFoodCalorie("7");
+            long myLong = Math.round(result);
+            int su = calorieDto.getFood_quan();
+            calorieDto.setIngest_calorie(myLong * su);
+        } else if (calorieDto.getFood_name().equals("Marinated_seasoning_crab")) {
+            calorieDto.setNutrition_num("9");
+            float result = calorieRepositoryCustomImpl.searchFoodCalorie("9");
+            long myLong = Math.round(result);
+            int su = calorieDto.getFood_quan();
+            calorieDto.setIngest_calorie(myLong * su);
+        }else {
+            calorieDto.setNutrition_num("10");
+            float result = calorieRepositoryCustomImpl.searchFoodCalorie("10");
+            long myLong = Math.round(result);
+            int su = calorieDto.getFood_quan();
+            calorieDto.setIngest_calorie(myLong * su);
+        }
+//        RefPhoto refPhoto = calorieDto.get(0).toEntityPhoto(calorieDto.get(0));
+//        System.out.println("photo 저장결과 : " + CalorieRepository.save(calorieDto));
+
+
         log.info("service의 insert 메소드");
         IngestDiet calorieEntity;
         calorieEntity = IngestDiet.builder()
-                .diet_num(ingestDiet.getDiet_num())
-                .food_image(ingestDiet.getFood_image())
-                .registration_date_ymd(ingestDiet.getRegistration_date_ymd())
-                .registration_date_hm(ingestDiet.getRegistration_date_hm())
-                .ingest_calorie(ingestDiet.getIngest_calorie())
-                .nutrition_num(ingestDiet.getNutrition_num())
-                .mem_email(ingestDiet.getMem_email())
+                .diet_num(calorieDto.getDiet_num())
+                .food_image(calorieDto.getFood_image())
+                .food_quan(calorieDto.getFood_quan())
+                .registration_date_ymd(calorieDto.getRegistration_date_ymd())
+                .registration_date_hm(calorieDto.getRegistration_date_hm())
+                .ingest_calorie(calorieDto.getIngest_calorie())
+                .nutrition_num(calorieDto.getNutrition_num())
+                .mem_email(calorieDto.getMem_email())
                 .build();
         return calorieRepository.save(calorieEntity);
     }

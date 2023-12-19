@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -25,14 +28,21 @@ public class MemPhysicalService {
 
 
     //1개 조회
-    public MemPhysical findByMemEmail(String memEmail) {
+    public MemPhysical findTopByMemEmailOrderByMemPhysicalDesc(String memEmail) {
         return memPhysicalRepository.findTopByMemEmailOrderByMemPhysicalDesc(memEmail);
     }
 
     //측정 정보 삭제
-    public void memPhysicalDelete(String email) {
-        Member member = memberRepository.findByMemEmail(email).get();
-        memPhysicalRepository.deleteByMemEmail(email);
+    public void memPhysicalDelete(Long memPhysical) {
+        memPhysicalRepository.deleteByMemPhysical(memPhysical);
+    }
+    //목록 조회
+    public MemPhysical findByMemEmail(String memEmail) {
+        return (MemPhysical) memPhysicalRepository.findByMemEmail(memEmail);
     }
 
+
+    public List<MemPhysical> findAllByMemEmail(String memEmail) {
+        return memPhysicalRepository.findAllByMemEmail(memEmail);
+    }
 }

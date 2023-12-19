@@ -10,4 +10,6 @@ public interface RefRepositoryCustom {
     void deleteAllByREF_CODE(Long REF_CODE);
     long findByRefCode(Long refCode);
     long findPhotoByRefCode(Long refCode);
+    RefDto findBydetail(Long refNum);
+    Long findByRefNum(Long refNum);
 }

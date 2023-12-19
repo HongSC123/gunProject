@@ -6,10 +6,12 @@ import com.ict.gun.jwt.token.entity.TokenRedis;
 import com.ict.gun.jwt.token.repositry.TokenRedisRepository;
 import com.ict.gun.jwt.util.JwtTokenUtil;
 import com.ict.gun.member.entity.Member;
+import com.ict.gun.member.entity.MemberCommand;
 import com.ict.gun.member.entity.MemberOptions;
 import com.ict.gun.member.entity.UserRole;
 import com.ict.gun.member.repository.MemberOptionRepository;
 import com.ict.gun.member.repository.MemberRepository;
+import com.ict.gun.member.repository.MemberRepositoryCustom;
 import com.ict.gun.member.service.MemberService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,16 +25,20 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.math.BigInteger;
+import java.nio.file.Files;
+import java.security.SecureRandom;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static com.ict.gun.jwt.util.JwtTokenUtil.createRefreshToken;
+import static com.ict.gun.jwt.util.JwtTokenUtil.createToken;
 import static com.ict.gun.member.controller.MemberUtil.decodeToken;
 import static com.ict.gun.member.controller.MemberUtil.emailToFolderName;
 
 @Slf4j
 @RequiredArgsConstructor
-@CrossOrigin
 @RestController
 public class MemberController {
     private final MemberService memberService;
@@ -40,6 +46,7 @@ public class MemberController {
     private final MemberRepository memberRepository;
     private final TokenRedisRepository tokenRedisRepository;
     private final MemberOptionRepository memberOptionRepository;
+    private final MemberRepositoryCustom memberRepositoryCustom;
 
     @Value("${application.security.jwt.secret-key}")
     String secretKey;
@@ -95,14 +102,6 @@ public class MemberController {
         member.setMemActLevel(memActLevel);
         member.setMemEmail(memEmail);
 
-        log.info("memGen : " + memGen);
-        log.info("memWeight : " + memWeight);
-        log.info("memHeight : " + memHeight);
-        log.info("memBir : " + memBir);
-        log.info("memActLevel : " + memActLevel);
-        log.info("memEmail : " + memEmail);
-
-
         //회원의 일일 권장 칼로리 계산
         int mem_reco_daily_calories = 0;
         //생일을 년도로만 포맷
@@ -125,7 +124,7 @@ public class MemberController {
         log.info("member : " + member);
         String forderName = "member/" + emailToFolderName(memEmail);
         // log.info("forderName : "+forderName);
-        if(handler.handleFileUpload(memPhoto, forderName)){
+        if(handler.handleFileUpload(memPhoto, forderName,memEmail)){
             memberBase.get().setMemPhoto(forderName+"/"+memPhoto.getOriginalFilename());
         }else{
             memberBase.get().setMemPhoto("default");
@@ -145,7 +144,7 @@ public class MemberController {
                                             @RequestParam(name = "memBir", required = false) Date memBir,
                                             @RequestParam(name = "memActLevel", required = false) Float memActLevel,
                                             @RequestParam(name = "memEmail", required = false) String memEmail,
-                                            @RequestPart(name = "memPhoto", required = false) MultipartFile memPhoto) {
+                                            @RequestPart(name = "memPhoto", required = false) MultipartFile memPhoto) throws IOException {
         MemberOptions member = new MemberOptions();
         FileHandler handler = new FileHandler();
         Optional<Member> memberBase = memberRepository.findByMemEmail(memEmail);
@@ -193,7 +192,7 @@ public class MemberController {
         if(memPhoto != null) {
             String forderName = "member/" + emailToFolderName(memEmail);
             // log.info("forderName : "+forderName);
-            if(handler.handleFileUpload(memPhoto, forderName)){
+            if(handler.handleFileUpload(memPhoto, forderName, memEmail)){
                 memberBase.get().setMemPhoto(forderName+"/"+memPhoto.getOriginalFilename());
             }else{
                 memberBase.get().setMemPhoto("default");
@@ -213,6 +212,15 @@ public class MemberController {
         log.info("member : " + member);
         Optional<Member> memberBase = memberRepository.findByMemEmail(member.getMemEmail());
         Map<String,String> result = new HashMap<>();
+
+        if(memberBase.get().getMemAct().equals("N")){
+            result.put("error", "805");
+            return ResponseEntity.ok().body(result);
+        }
+        if(memberBase.get().getMemQuit() != null){
+            result.put("error", "804");
+            return ResponseEntity.ok().body(result);
+        }
         if(memberBase.isEmpty()){
             result.put("error", "801");
         }
@@ -222,7 +230,7 @@ public class MemberController {
         if(!passwordEncoder.passwordEncoder().matches(member.getMemPw(), memberBase.get().getMemPw())){
             result.put("error", "802");
         }else{
-            String Token = JwtTokenUtil.createToken(member.getMemEmail(), secretKey, expiration);
+            String Token = createToken(member.getMemEmail(), secretKey, expiration);
             String RefreshToken = JwtTokenUtil.createRefreshToken(member.getMemEmail(),secretKey, refreshTokenExpiration);
             result.put("accessToken", Token);
             result.put("refreshToken", RefreshToken);
@@ -260,7 +268,7 @@ public class MemberController {
             Claims refreshToken = decodeToken(refresh, secretKey);
             String memEmail = refreshToken.get("loginId", String.class);
             log.info("memEmail : " + memEmail);
-            access = JwtTokenUtil.createToken(memEmail, secretKey, expiration);
+            access = createToken(memEmail, secretKey, expiration);
             TokenRedis newAccessToken = new TokenRedis(memEmail, access, refresh, expiration, refreshTokenExpiration);
 
             Optional<TokenRedis> token = tokenRedisRepository.findById(memEmail);
@@ -306,15 +314,16 @@ public class MemberController {
 
     @PostMapping("/loginkakao")
     public ResponseEntity<Map<String,String>> loginKakao(@RequestBody Map<String, String> kakaoInfo) {
-        String accessToken = kakaoInfo.get("accessToken");
-        String refreshToken = kakaoInfo.get("refreshToken");
+        String accessToken = createToken(kakaoInfo.get("memEmail"), secretKey, expiration);
+        String refreshToken = createRefreshToken(kakaoInfo.get("memEmail"), secretKey, refreshTokenExpiration);
         String memEmail = kakaoInfo.get("memEmail");
         Member kakaoMember = new Member();
         kakaoMember.setMemEmail(memEmail);
         kakaoMember.setMemType("KAKAO");
         kakaoMember.setRole(UserRole.USER);
         kakaoMember.setMemPw(memEmail);
-        if (memberRepository.findById(memEmail).get().getMemEn() != null) {
+        if (memberRepository.findById(memEmail).get().getMemEn() !=
+                null) {
             kakaoMember.setMemMod(new Date(System.currentTimeMillis()));
         } else {
             kakaoMember.setMemEn(new Date(System.currentTimeMillis()));
@@ -352,8 +361,7 @@ public class MemberController {
     @GetMapping("/profile")
     public ResponseEntity<Map<String,Object>> profile(HttpServletRequest request) {
         if(request.getHeader("loginType").equals("KAKAO")){
-            String memEmail = request.getHeader("memEmail");
-            return ResponseEntity.ok().body(getProfile(memEmail));
+            return ResponseEntity.ok().body(getProfile(request.getHeader("memEmail")));
         }else{
             return ResponseEntity.ok().body(getProfile(decodeToken(request.getHeader(HttpHeaders.AUTHORIZATION).split(" ")[1], secretKey).get("loginId", String.class)));
         }
@@ -377,7 +385,7 @@ public class MemberController {
         result.put("memHeight", memberOptions.getMemHeight());
         result.put("memBir", memberOptions.getMemBir());
         result.put("memActLevel", memberOptions.getMemActLevel());
-
+        result.put("memAct", member.get().getMemAct());
         return result;
     }
 
@@ -404,8 +412,19 @@ public class MemberController {
         }
     }
     @GetMapping("/admin/list")
-    public List<Member> adminList(){
-        return memberRepository.findByRoleNot(UserRole.ADMIN);
+    public List<MemberCommand> adminList(){
+        return memberRepositoryCustom.getMembers();
+    }
+    @PutMapping("/admin/update/{memEmail}")
+    public void adminUpdate(@PathVariable String memEmail){
+        Member member = memberRepository.findById(memEmail).get();
+        String nowAct = member.getMemAct();
+        if(nowAct.equals("Y")){
+            member.setMemAct("N");
+        }else{
+            member.setMemAct("Y");
+        }
+        memberRepository.save(member);
     }
     @PostMapping("/login/face")
     public ResponseEntity<Map<String,String>> loginFace(@RequestBody Map<String, String> base64Image,HttpServletRequest request) {
@@ -439,7 +458,7 @@ public class MemberController {
             if(memEmail.equals(photoEmail)){
                 Optional<Member> member = memberRepository.findById(memEmail);
                 log.info("로그인 성공");
-                String Token = JwtTokenUtil.createToken(member.get().getMemEmail(), secretKey, expiration);
+                String Token = createToken(member.get().getMemEmail(), secretKey, expiration);
                 String RefreshToken = JwtTokenUtil.createRefreshToken(member.get().getMemEmail(),secretKey, refreshTokenExpiration);
                 result.put("accessToken", Token);
                 result.put("refreshToken", RefreshToken);
@@ -458,5 +477,47 @@ public class MemberController {
         }
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+    }
+
+    @GetMapping("/loginnaver")
+    public ResponseEntity<String> loginNaver(HttpServletRequest request){
+        log.info("naver");
+        return ResponseEntity.ok(getNaverReqUrl(request));
+    }
+
+    public String getNaverReqUrl(HttpServletRequest request){
+        String clientId = "f1BG7G9EyIydwNiBcpjq";
+        String redirectUrl = "http://localhost:8888/login/naver";
+        String state = generateState();
+
+        String reqUrl = "https://nid.naver.com/oauth2.0/authorize" +
+                "?response_type=code" +
+                "&client_id=" + clientId +
+                "&redirect_uri=" + redirectUrl +
+                "&state=" + state;
+        request.getSession().setAttribute("state", state);
+        return reqUrl;
+    }
+    public String generateState() {
+        return new BigInteger(130, new SecureRandom()).toString(32);
+    }
+
+    @PatchMapping("/emailok")
+    public void emailOk(HttpServletRequest request){
+
+        String memEmail = request.getHeader("memEmail");
+        Optional<Member> member = memberRepository.findById(memEmail);
+        member.get().setMemAct("M");
+        memberRepository.save(member.get());
+
+    }
+
+    @PatchMapping("/updelete")
+    public void updelete(HttpServletRequest request){
+
+        String memEmail = request.getHeader("memEmail");
+        Optional<Member> member = memberRepository.findById(memEmail);
+        member.get().setMemQuit(new Date(System.currentTimeMillis()));
+        memberRepository.save(member.get());
     }
 }

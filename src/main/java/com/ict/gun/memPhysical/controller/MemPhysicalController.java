@@ -21,10 +21,7 @@ import java.io.Console;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.sql.Date;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 
@@ -55,7 +52,7 @@ public class MemPhysicalController {
         memPhysicalService.save(mem_physical);
         FileHandler handler = new FileHandler();
         String phyPhotoDir = "/physical";
-        if(handler.handleFileUpload(memPhysical,phyPhotoDir)){
+        if(handler.handleFileUpload(memPhysical,phyPhotoDir,memEmail)){
             try {
                 String[] command = {
                         "E:/gun_workspace/gun/src/main/resources/keypoints/keypoints.exe",
@@ -116,8 +113,9 @@ public class MemPhysicalController {
         Map<String, Object> result = new HashMap<>();
         // log.info("memPhysical detail");
         log.info("memEmail : " + memEmail);
-        MemPhysical memPhysical = memPhysicalService.findByMemEmail(memEmail);
+        MemPhysical memPhysical = memPhysicalService.findTopByMemEmailOrderByMemPhysicalDesc(memEmail);
         log.info("memPhysical : " + memPhysical);
+        result.put("physicalNum",memPhysical.getMemPhysical());
         result.put("Location",memPhysical.getMemLocation());
         result.put("InputDate",memPhysical.getMemInputDate().toString());
 
@@ -166,17 +164,66 @@ public class MemPhysicalController {
         }
     }
 
-//    @DeleteMapping("/delete/{MEM_EMAIL}") //측정 정보 삭제하기
-//    public ResponseEntity<String> memPhysicalDelete(@PathVariable("MEM_EMAIL") String email) {
-//        try {
-//            memPhysicalService.memPhysicalDelete(email);
-//            String result = "측정 정보 삭제";
-//            return ResponseEntity.ok(result);
-//        } catch (Exception e) {
-//            String result = "측정 정보 삭제 실패";
-//            return ResponseEntity.status(500).body(result);
-//        }
-//
-//    }
+@DeleteMapping("/delete/physical/{MEM_PHYSICAL}") //측정 정보 삭제하기
+    public void memPhysicalDelete(@PathVariable("MEM_PHYSICAL") Long memPhysical) {
+
+        log.info("memPhysical : 삭제" + memPhysical);
+        memPhysicalService.memPhysicalDelete(memPhysical);
+    }
+
+    @PostMapping("/list/physical")
+    public ResponseEntity<List<Map<String, Object>>> memPhysicalList(HttpServletRequest request) {
+        String memEmail = request.getHeader("memEmail");
+
+        log.info("**측정 목록 불러오기 memEmail : " + memEmail);
+
+        // 이메일로 데이터베이스를 조회하여 측정 정보를 가져옵니다.
+        List<MemPhysical> memPhysicalList = memPhysicalService.findAllByMemEmail(memEmail);
+        log.info("**측정 목록 불러오기 memPhysicalList : " + memPhysicalList);
+        // 만약 해당 이메일로 찾은 정보가 없을 경우 NOT_FOUND 상태 코드를 반환합니다.
+        if (memPhysicalList == null || memPhysicalList.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        List<Map<String, Object>> resultList = new ArrayList<>();
+
+        for (MemPhysical memPhysical : memPhysicalList) {
+            Map<String, Object> result = new HashMap<>();
+
+            result.put("physicalNum", memPhysical.getMemPhysical());
+            result.put("Location", memPhysical.getMemLocation());
+            result.put("InputDate", memPhysical.getMemInputDate().toString());
+
+            // JSON 문자열
+            String jsonString = memPhysical.getMemPoint();
+
+            // Jackson ObjectMapper 생성
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<String, Object> pointMap = new HashMap<>();
+
+            try {
+                // JSON 문자열을 MyDataObject 클래스의 내부 클래스로 변환
+                OuterClass.PointData myDataObject = objectMapper.readValue(jsonString, OuterClass.PointData.class);
+
+                // 변환된 객체 출력
+                pointMap.put("ear", myDataObject.getEar());
+                pointMap.put("shoulder", myDataObject.getShoulder());
+                pointMap.put("hip", myDataObject.getHip());
+                pointMap.put("knee", myDataObject.getKnee());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            result.put("Point", pointMap);
+
+            resultList.add(result);
+        }
+
+        log.info("************* List result : " + resultList);
+
+        return ResponseEntity.ok(resultList);
+    }
+
+
+
 
 }
